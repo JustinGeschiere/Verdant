@@ -10,10 +10,4 @@
     <PackageReference Include="MediatR" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Food\" />
-    <Folder Include="Drink\" />
-    <Folder Include="Menu\" />
-  </ItemGroup>
-
 </Project>

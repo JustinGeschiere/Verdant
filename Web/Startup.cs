@@ -7,10 +7,10 @@ public class Startup(IConfiguration configuration)
 {
 	public void ConfigureServices(IServiceCollection services)
 	{
-		services.AddDbContext<SnackTraceContext>(options => options.UseSqlServer(connectionString));
+		services.AddDbContext<VerdantContext>(options => options.UseSqlServer(connectionString));
 
 		services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-			.AddEntityFrameworkStores<SnackTraceContext>();
+			.AddEntityFrameworkStores<VerdantContext>();
 
 
 		services.AddControllersWithViews();
