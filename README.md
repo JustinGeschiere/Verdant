@@ -1,2 +1,2 @@
-# Snacktrace-2
-Small project to show code base maintainability strategies
+# Verdant
+An app that keeps your plants healthy by automatically generating personalized care schedules.
