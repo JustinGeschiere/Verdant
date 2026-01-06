@@ -1,12 +1,10 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgres:16
-    container_name: verdant-db
+    container_name: verdant_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: verdant-db
+      POSTGRES_DB: verdant
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
     ports:
@@ -14,7 +12,7 @@ services:
     volumes:
       - ./.storage/var/lib/postgresql/data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U root"]
+      test: ["CMD-SHELL", "pg_isready -U root -d verdant"]
       interval: 10s
       timeout: 5s
       retries: 5
