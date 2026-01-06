@@ -416,3 +416,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Dependency containers volume binding
+.ci/dependencies/.storage/
