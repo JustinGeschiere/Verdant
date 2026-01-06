@@ -14,6 +14,8 @@ public class VerdantContext(DbContextOptions<VerdantContext> options) : Identity
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
+		base.OnModelCreating(modelBuilder);
+
 		// Multiple plants <-> multiple users
 		modelBuilder.Entity<UserPlant>(e =>
 		{

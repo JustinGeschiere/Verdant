@@ -1,6 +1,7 @@
 ﻿using Core.Extensions;
 using Core.Options;
 using Data;
+using Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,8 +20,9 @@ public class Startup(IConfiguration configuration)
 		services.AddDbContext<VerdantContext>(options => options.UseNpgsql(sqlOptions.ConnectionString));
 
 		// Identity
-		services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-			.AddEntityFrameworkStores<VerdantContext>();
+		services.AddIdentity<User, Role>(options => options.SignIn.RequireConfirmedAccount = true)
+			.AddEntityFrameworkStores<VerdantContext>()
+			.AddDefaultTokenProviders();
 
 		services.AddControllersWithViews();
 	}

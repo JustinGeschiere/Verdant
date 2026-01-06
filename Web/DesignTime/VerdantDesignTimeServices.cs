@@ -1,9 +1,7 @@
-﻿using Data.Generators;
-using Microsoft.EntityFrameworkCore.Design;
+﻿using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Migrations.Design;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Data
+namespace Web.DesignTime
 {
 	public class VerdantDesignTimeServices : IDesignTimeServices
 	{
