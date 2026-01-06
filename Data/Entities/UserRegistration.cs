@@ -6,7 +6,7 @@ namespace Data.Entities
 	{
 		public Guid Id { get; set; }
 
-		[Required()]
+		[Required(AllowEmptyStrings = false)]
 		public required string Token { get; set; }
 
 		public DateTime ExpirationDate { get; set; }
