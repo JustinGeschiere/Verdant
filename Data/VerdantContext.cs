@@ -6,21 +6,27 @@ namespace Data;
 
 public class VerdantContext(DbContextOptions<VerdantContext> options) : IdentityDbContext<User, Role, Guid>(options)
 {
-	public DbSet<Food> Foods { get; set; }
-	public DbSet<Drink> Drinks { get; set; }
-	public DbSet<Menu> Menus { get; set; }
+	public DbSet<Plant> Plants { get; set; }
+
+	public DbSet<UserPlant> UserPlants { get; set; }
+
+	public DbSet<UserRegistration> UserRegistrations { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		// Multiple snacks <-> multiple menus relationship
-		modelBuilder.Entity<Menu>()
-			.HasMany(i => i.Foods)
-			.WithMany(i => i.Menus);
+		// Multiple plants <-> multiple users
+		modelBuilder.Entity<UserPlant>(e =>
+		{
+			e.HasKey(i => new { i.PlantId, i.UserId });
 
-		// Multiple drinks <-> multiple menus relationship
-		modelBuilder.Entity<Menu>()
-			.HasMany(i => i.Drinks)
-			.WithMany(i => i.Menus);
+			e.HasOne(i => i.Plant)
+				.WithMany(i => i.UserPlants)
+				.HasForeignKey(i => i.PlantId);
+
+			e.HasOne(i => i.User)
+				.WithMany(i => i.UserPlants)
+				.HasForeignKey(i => i.UserId);
+		});
 
 		// Conversion to widely support TimeSpan properties (Timespan <-> Ticks)
 		modelBuilder.Entity<Plant>()

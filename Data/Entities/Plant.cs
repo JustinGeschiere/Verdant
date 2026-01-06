@@ -20,5 +20,7 @@ namespace Data.Entities
 		public required TimeSpan WinterWateringInterval { get; set; }
 
 		public DateTime? LastWateredDate { get; set; }
+
+		public ICollection<UserPlant> UserPlants { get; set; } = new List<UserPlant>();
 	}
 }

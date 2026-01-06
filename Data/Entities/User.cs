@@ -12,6 +12,8 @@ public class User : IdentityUser<Guid>
 	[StringLength(128)]
 	public string? LastName { get; set; }
 
+	public ICollection<UserPlant> UserPlants { get; set; } = new List<UserPlant>();
+
 	[NotMapped]
 	public string FullName => $"{FirstName} {LastName}".Trim();
 }

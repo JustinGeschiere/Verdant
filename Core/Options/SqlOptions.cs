@@ -4,8 +4,8 @@ namespace Core.Options;
 
 public class SqlOptions
 {
-	const string SECTION = "Sql";
+	public const string SECTION = "Sql";
 
 	[Required(AllowEmptyStrings = false)]
-	public string ConnectionString { get; set; }
+	public required string ConnectionString { get; set; }
 }
