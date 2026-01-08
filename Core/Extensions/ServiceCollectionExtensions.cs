@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Extensions
 {
-	public static class ServiceCollectionExtentions
+	public static class ServiceCollectionExtensions
 	{
 		public static IServiceCollection AddVerdantOptions(this IServiceCollection services)
 		{

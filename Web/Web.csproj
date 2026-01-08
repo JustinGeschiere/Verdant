@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
@@ -17,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
+    <ProjectReference Include="..\Feature\Feature.csproj" />
     <ProjectReference Include="..\Test\Test.csproj" />
   </ItemGroup>
 

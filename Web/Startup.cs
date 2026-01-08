@@ -2,6 +2,7 @@
 using Core.Options;
 using Data;
 using Data.Entities;
+using Feature.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,11 @@ public class Startup(IConfiguration configuration)
 {
 	public void ConfigureServices(IServiceCollection services)
 	{
+		// Options registration
 		services.AddVerdantOptions();
+
+		// Mediatr registration
+		services.AddVerdantFeatures();
 
 		// Database
 		var sqlOptions = configuration.GetSection(SqlOptions.SECTION)
