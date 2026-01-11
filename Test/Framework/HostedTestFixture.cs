@@ -49,7 +49,7 @@ namespace Test.Framework
 		[TearDown]
 		public virtual async Task TearDown()
 		{
-			
+			// No implementation, but still present to provide overridable TearDown to pair with SetUp
 		}
 
 		/// <summary>
@@ -59,8 +59,8 @@ namespace Test.Framework
 		protected override void ConfigureServices(IServiceCollection services)
 		{
 			// Overwrite database registration with in-memory database
-			services.RemoveServiceRegistration<DbContextOptions<T>>();
-			services.AddDbContext<T>(options =>
+			services.RemoveServiceRegistration<DbContextOptions<TContext>>();
+			services.AddDbContext<TContext>(options =>
 			{
 				options.UseSqlite("DataSource=:memory:");
 			});
