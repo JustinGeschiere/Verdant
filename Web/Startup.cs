@@ -34,7 +34,12 @@ public class Startup(IConfiguration configuration)
 			.AddEntityFrameworkStores<VerdantContext>()
 			.AddDefaultTokenProviders();
 
+		services.AddHttpContextAccessor();
+
 		services.AddControllersWithViews();
+
+		// Setup functionalities like database migrations
+		services.AddHostedService<SetUp>();
 	}
 
 	public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

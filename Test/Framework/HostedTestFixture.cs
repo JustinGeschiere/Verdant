@@ -1,12 +1,72 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Test.Framework.Helpers;
 using Web;
 
 namespace Test.Framework
 {
+	public abstract class HostedTestFixture<TContext> : HostedTestFixture
+		where TContext : DbContext
+	{
+		private SqliteConnection connection = default!;
+
+		[OneTimeSetUp]
+		public override async Task OneTimeSetUp()
+		{
+			connection = new SqliteConnection("DataSource=:memory:");
+			await connection.OpenAsync();
+
+			await base.OneTimeSetUp();
+		}
+
+		public override async Task OneTimeTearDown()
+		{
+			await base.OneTimeTearDown();
+
+			connection?.Close();
+			connection?.Dispose();
+		}
+
+		[SetUp]
+		public virtual async Task SetUp()
+		{
+			await ScopeAsync(async services =>
+			{
+				var context = services.GetRequiredService<TContext>();
+
+				await context.Database.EnsureDeletedAsync();
+
+				await context.Database.EnsureCreatedAsync();
+				await context.Database.MigrateAsync();
+			});
+		}
+
+		[TearDown]
+		public virtual async Task TearDown()
+		{
+			
+		}
+
+		/// <summary>
+		/// Override method for implementations to specify custom service registrations
+		/// </summary>
+		/// <param name="services"></param>
+		protected override void ConfigureServices(IServiceCollection services)
+		{
+			// Overwrite database registration with in-memory database
+			services.RemoveServiceRegistration<DbContextOptions<T>>();
+			services.AddDbContext<T>(options =>
+			{
+				options.UseSqlite("DataSource=:memory:");
+			});
+		}
+	}
+
 	public abstract class HostedTestFixture
 	{
 		protected IHost Host { get; private set; } = default!;
@@ -14,7 +74,7 @@ namespace Test.Framework
 		protected IServiceProvider Services { get; private set; } = default!;
 
 		[OneTimeSetUp]
-		public async Task OneTimeSetup()
+		public virtual async Task OneTimeSetUp()
 		{
 			Host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
 				.ConfigureWebHostDefaults(webBuilder =>
@@ -22,10 +82,12 @@ namespace Test.Framework
 					webBuilder.UseEnvironment("Test");
 					webBuilder.UseStartup<Startup>();
 					webBuilder.UseTestServer();
+
+					// Service configuration overrides
+					webBuilder.ConfigureTestServices(services => ConfigureServices(services));
 				}).Build();
 
 			// Service configuration overrides
-			ConfigureServices();
 
 			await Host.StartAsync();
 
@@ -34,7 +96,7 @@ namespace Test.Framework
 		}
 
 		[OneTimeTearDown]
-		public async Task OneTimeTeardown()
+		public virtual async Task OneTimeTearDown()
 		{
 			if (Host != null)
 			{
@@ -45,10 +107,12 @@ namespace Test.Framework
 			Host?.Dispose();
 		}
 
-		protected virtual void ConfigureServices()
-		{
-			// Override method for implementations to specify custom service registrations
-		}
+		/// <summary>
+		/// Override method for implementations to specify custom service registrations
+		/// </summary>
+		/// <param name="services"></param>
+		protected virtual void ConfigureServices(IServiceCollection services)
+		{ }
 
 		public async Task ScopeAsync(Func<IServiceProvider, Task> action)
 		{

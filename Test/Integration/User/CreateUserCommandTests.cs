@@ -14,7 +14,7 @@ namespace Test.Integration.User
 			// Arrange
 			var request = new CreateUserCommand.Request()
 			{
-				EmailAddress = "t.ester@verdant.com"
+				EmailAddress = "tester@test.com"
 			};
 
 			// Act
