@@ -7,9 +7,9 @@ namespace Test
 	[TestFixture]
 	public class VerdantFixture : HostedTestFixture<VerdantContext>
 	{
-		protected override void ConfigureTestServices(IServiceCollection services)
+		protected override void ConfigureOverrideServices(IServiceCollection services)
 		{
-			base.ConfigureTestServices(services);
+			base.ConfigureOverrideServices(services);
 		}
 	}
 }

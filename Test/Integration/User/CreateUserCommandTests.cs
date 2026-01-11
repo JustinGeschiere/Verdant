@@ -3,10 +3,6 @@ using Data.Entities;
 using Feature.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Net.Mail;
-using System.Text;
 
 namespace Test.Integration.User
 {
@@ -43,7 +39,6 @@ namespace Test.Integration.User
 			{
 				var context = services.GetRequiredService<VerdantContext>();
 
-				var plantName = Guid.NewGuid().ToString();
 				var plant = new Plant()
 				{
 					GivenName = plantName,

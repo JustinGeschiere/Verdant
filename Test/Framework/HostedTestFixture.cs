@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,13 +16,12 @@ namespace Test.Framework
 	public abstract class HostedTestFixture<TContext> : HostedTestFixture
 		where TContext : DbContext
 	{
-		private SqliteConnection connection = default!;
+		private SqliteConnection sqliteConnection = default!;
 
-		[OneTimeSetUp]
 		public override async Task OneTimeSetUp()
 		{
-			connection = new SqliteConnection("DataSource=:memory:");
-			await connection.OpenAsync();
+			sqliteConnection = new SqliteConnection("DataSource=:memory:");
+			await sqliteConnection.OpenAsync();
 
 			await base.OneTimeSetUp();
 		}
@@ -30,8 +30,8 @@ namespace Test.Framework
 		{
 			await base.OneTimeTearDown();
 
-			connection?.Close();
-			connection?.Dispose();
+			sqliteConnection?.Close();
+			sqliteConnection?.Dispose();
 		}
 
 		[SetUp]
@@ -43,7 +43,6 @@ namespace Test.Framework
 
 				await context.Database.EnsureDeletedAsync();
 				await context.Database.EnsureCreatedAsync();
-				await context.Database.MigrateAsync();
 			});
 		}
 
@@ -57,7 +56,7 @@ namespace Test.Framework
 		/// Override method for implementations to specify custom service registrations
 		/// </summary>
 		/// <param name="services"></param>
-		protected override void ConfigureTestServices(IServiceCollection services)
+		protected override void ConfigureOverrideServices(IServiceCollection services)
 		{
 			// Remove any existing database provider registration
 			services.RemoveServiceRegistrations<IDbContextOptionsConfiguration<VerdantContext>>();
@@ -65,11 +64,13 @@ namespace Test.Framework
 			// Register Sqlite database provider instead
 			services.AddDbContext<VerdantContext>(options =>
 			{
-				options.UseSqlite("DataSource=:memory:");
+				options.UseSqlite(sqliteConnection);
+				options.ConfigureWarnings(i => i.Ignore(RelationalEventId.PendingModelChangesWarning));
 			});
 		}
 	}
 
+	[Parallelizable(ParallelScope.None)]
 	public abstract class HostedTestFixture
 	{
 		protected IHost Host { get; private set; } = default!;
@@ -87,7 +88,7 @@ namespace Test.Framework
 					webBuilder.UseTestServer();
 
 					// Service configuration overrides
-					webBuilder.ConfigureServices(services => ConfigureTestServices(services));
+					webBuilder.ConfigureServices(services => ConfigureOverrideServices(services));
 				}).Build();
 
 			// Service configuration overrides
@@ -114,7 +115,7 @@ namespace Test.Framework
 		/// Override method for implementations to specify custom service registrations
 		/// </summary>
 		/// <param name="services"></param>
-		protected virtual void ConfigureTestServices(IServiceCollection services)
+		protected virtual void ConfigureOverrideServices(IServiceCollection services)
 		{ }
 
 		public async Task ScopeAsync(Func<IServiceProvider, Task> action)
