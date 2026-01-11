@@ -1,8 +1,10 @@
-﻿using MediatR;
+﻿using Data;
+using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Test.Framework.Helpers;
@@ -40,7 +42,6 @@ namespace Test.Framework
 				var context = services.GetRequiredService<TContext>();
 
 				await context.Database.EnsureDeletedAsync();
-
 				await context.Database.EnsureCreatedAsync();
 				await context.Database.MigrateAsync();
 			});
@@ -56,11 +57,13 @@ namespace Test.Framework
 		/// Override method for implementations to specify custom service registrations
 		/// </summary>
 		/// <param name="services"></param>
-		protected override void ConfigureServices(IServiceCollection services)
+		protected override void ConfigureTestServices(IServiceCollection services)
 		{
-			// Overwrite database registration with in-memory database
-			services.RemoveServiceRegistration<DbContextOptions<TContext>>();
-			services.AddDbContext<TContext>(options =>
+			// Remove any existing database provider registration
+			services.RemoveServiceRegistrations<IDbContextOptionsConfiguration<VerdantContext>>();
+
+			// Register Sqlite database provider instead
+			services.AddDbContext<VerdantContext>(options =>
 			{
 				options.UseSqlite("DataSource=:memory:");
 			});
@@ -84,7 +87,7 @@ namespace Test.Framework
 					webBuilder.UseTestServer();
 
 					// Service configuration overrides
-					webBuilder.ConfigureTestServices(services => ConfigureServices(services));
+					webBuilder.ConfigureServices(services => ConfigureTestServices(services));
 				}).Build();
 
 			// Service configuration overrides
@@ -111,7 +114,7 @@ namespace Test.Framework
 		/// Override method for implementations to specify custom service registrations
 		/// </summary>
 		/// <param name="services"></param>
-		protected virtual void ConfigureServices(IServiceCollection services)
+		protected virtual void ConfigureTestServices(IServiceCollection services)
 		{ }
 
 		public async Task ScopeAsync(Func<IServiceProvider, Task> action)

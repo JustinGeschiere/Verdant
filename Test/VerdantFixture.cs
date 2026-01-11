@@ -1,14 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Data;
+using Microsoft.Extensions.DependencyInjection;
 using Test.Framework;
 
 namespace Test
 {
 	[TestFixture]
-	public class VerdantFixture : HostedTestFixture
+	public class VerdantFixture : HostedTestFixture<VerdantContext>
 	{
-		protected override void ConfigureServices(IServiceCollection services)
+		protected override void ConfigureTestServices(IServiceCollection services)
 		{
-			base.ConfigureServices(services);
+			base.ConfigureTestServices(services);
 		}
 	}
 }
