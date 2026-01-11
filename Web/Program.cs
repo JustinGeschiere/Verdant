@@ -1,6 +1,4 @@
-using Web;
-
-namespace SnackTrace.Web;
+namespace Web;
 
 public class Program
 {

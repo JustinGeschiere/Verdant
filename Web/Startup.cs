@@ -5,6 +5,7 @@ using Data.Entities;
 using Feature.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Web.Extensions;
 
 namespace Web;
 
@@ -25,7 +26,11 @@ public class Startup(IConfiguration configuration)
 		services.AddDbContext<VerdantContext>(options => options.UseNpgsql(sqlOptions.ConnectionString));
 
 		// Identity
-		services.AddIdentity<User, Role>(options => options.SignIn.RequireConfirmedAccount = true)
+		services.AddIdentity<User, Role>(options =>
+			{
+				options.SignIn.RequireConfirmedAccount = true;
+				options.UseVerdantPasswordRequirements();
+			})
 			.AddEntityFrameworkStores<VerdantContext>()
 			.AddDefaultTokenProviders();
 

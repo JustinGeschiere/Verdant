@@ -19,7 +19,6 @@
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
     <ProjectReference Include="..\Feature\Feature.csproj" />
-    <ProjectReference Include="..\Test\Test.csproj" />
   </ItemGroup>
 
 </Project>
