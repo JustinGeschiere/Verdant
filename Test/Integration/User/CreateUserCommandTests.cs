@@ -76,7 +76,6 @@ namespace Test.Integration.User
 			// Arrange
 			var name = Guid.NewGuid().ToString();
 
-			// Act
 			await ScopeAsync(async services =>
 			{
 				var httpContextBuilder = services.GetRequiredService<IHttpContextBuilder>();
@@ -86,11 +85,11 @@ namespace Test.Integration.User
 					.Apply();
 			});
 
-			// Assert
+			// Act & Assert
 			await ScopeAsync(async services =>
 			{
-				var httpContext = services.GetRequiredService<IHttpContextAccessor>().HttpContext;
-				var assignedName = httpContext!.User.Claims.First(i => i.Type == ClaimTypes.Name).Value;
+				var httpContext = services.GetRequiredService<IHttpContextAccessor>().HttpContext!;
+				var assignedName = httpContext.User.Claims.First(i => i.Type == ClaimTypes.Name).Value;
 
 				Assert.That(assignedName, Is.EqualTo(name));
 			});
@@ -99,16 +98,11 @@ namespace Test.Integration.User
 		[Test]
 		public async Task HttpContext_IsClearedInNewTest()
 		{
-			// Arrange
-			var name = Guid.NewGuid().ToString();
-
-			// Act
-
-			// Assert
+			// Act & Assert
 			await ScopeAsync(async services =>
 			{
-				var httpContext = services.GetRequiredService<IHttpContextAccessor>().HttpContext;
-				var nameClaim = httpContext!.User.Claims.FirstOrDefault(i => i.Type == ClaimTypes.Name);
+				var httpContext = services.GetRequiredService<IHttpContextAccessor>().HttpContext!;
+				var nameClaim = httpContext.User.Claims.FirstOrDefault(i => i.Type == ClaimTypes.Name);
 
 				Assert.That(nameClaim, Is.Null);
 			});
