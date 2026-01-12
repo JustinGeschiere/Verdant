@@ -54,7 +54,7 @@ namespace Web
 			}
 			catch (Exception e)
 			{
-				_logger.LogError(e, "SetUp failed with exceptions during database migration");
+				_logger.LogError(e, "SetUp failed with exceptions during database migration.");
 				throw;
 			}
 		}

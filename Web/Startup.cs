@@ -21,7 +21,7 @@ public class Startup(IConfiguration configuration)
 
 		// Database
 		var sqlOptions = configuration.GetSection(SqlOptions.SECTION)
-			.Get<SqlOptions>() ?? throw new InvalidOperationException($"Section {SqlOptions.SECTION} with type {nameof(SqlOptions)} not configured");
+			.Get<SqlOptions>() ?? throw new InvalidOperationException($"Section {SqlOptions.SECTION} with type '{nameof(SqlOptions)}' not configured.");
 
 		services.AddDbContext<VerdantContext>(options => options.UseNpgsql(sqlOptions.ConnectionString));
 
