@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Test.Framework.Helpers;
+using Test.Framework.Services.Abstractions;
+using Test.Framework.Services.Implementations;
 using Web;
 
 namespace Test.Framework
@@ -34,9 +36,10 @@ namespace Test.Framework
 			sqliteConnection?.Dispose();
 		}
 
-		[SetUp]
-		public virtual async Task SetUp()
+		public override async Task SetUp()
 		{
+			await base.SetUp();
+
 			await ScopeAsync(async services =>
 			{
 				var context = services.GetRequiredService<TContext>();
@@ -46,18 +49,14 @@ namespace Test.Framework
 			});
 		}
 
-		[TearDown]
-		public virtual async Task TearDown()
-		{
-			// No implementation, but still present to provide overridable TearDown to pair with SetUp
-		}
-
 		/// <summary>
 		/// Override method for implementations to specify custom service registrations
 		/// </summary>
 		/// <param name="services"></param>
 		protected override void ConfigureOverrideServices(IServiceCollection services)
 		{
+			base.ConfigureOverrideServices(services);
+
 			// Remove any existing database provider registration
 			services.RemoveServiceRegistrations<IDbContextOptionsConfiguration<VerdantContext>>();
 
@@ -91,8 +90,6 @@ namespace Test.Framework
 					webBuilder.ConfigureServices(services => ConfigureOverrideServices(services));
 				}).Build();
 
-			// Service configuration overrides
-
 			await Host.StartAsync();
 
 			Server = Host.GetTestServer();
@@ -111,22 +108,51 @@ namespace Test.Framework
 			Host?.Dispose();
 		}
 
+		[SetUp]
+		public virtual async Task SetUp()
+		{
+			await ScopeAsync(async services =>
+			{
+				// Start every test with a clear (anonymous) http context
+				var httpContextBuilder = services.GetRequiredService<IHttpContextBuilder>();
+				httpContextBuilder.Clear();
+			});
+		}
+
+		[TearDown]
+		public virtual async Task TearDown()
+		{
+			// No implementation, but still present to provide overridable TearDown to pair with SetUp
+		}
+
 		/// <summary>
 		/// Override method for implementations to specify custom service registrations
 		/// </summary>
 		/// <param name="services"></param>
 		protected virtual void ConfigureOverrideServices(IServiceCollection services)
-		{ }
+		{
+			services.AddSingleton<IHttpContextBuilder, HttpContextBuilder>();
+		}
 
 		public async Task ScopeAsync(Func<IServiceProvider, Task> action)
 		{
 			using var scope = Services.CreateScope();
+
+			// Apply http context across async roots
+			scope.ServiceProvider.GetRequiredService<IHttpContextBuilder>()
+				.Apply();
+
 			await action(scope.ServiceProvider);
 		}
 
 		public async Task<T> ScopeAsync<T>(Func<IServiceProvider, Task<T>> action)
 		{
 			using var scope = Services.CreateScope();
+
+			// Apply http context across async roots
+			scope.ServiceProvider.GetRequiredService<IHttpContextBuilder>()
+				.Apply();
+
 			return await action(scope.ServiceProvider);
 		}
 

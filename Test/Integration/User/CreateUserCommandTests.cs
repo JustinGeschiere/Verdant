@@ -1,8 +1,11 @@
 ﻿using Data;
 using Data.Entities;
 using Feature.User;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Security.Claims;
+using Test.Framework.Services.Abstractions;
 
 namespace Test.Integration.User
 {
@@ -64,6 +67,50 @@ namespace Test.Integration.User
 
 					Assert.That(context.Plants.Count(), Is.EqualTo(1));
 				}
+			});
+		}
+
+		[Test]
+		public async Task HttpContext_CanImpersonate()
+		{
+			// Arrange
+			var name = Guid.NewGuid().ToString();
+
+			// Act
+			await ScopeAsync(async services =>
+			{
+				var httpContextBuilder = services.GetRequiredService<IHttpContextBuilder>();
+
+				httpContextBuilder
+					.WithUser(new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.Name, name)])))
+					.Apply();
+			});
+
+			// Assert
+			await ScopeAsync(async services =>
+			{
+				var httpContext = services.GetRequiredService<IHttpContextAccessor>().HttpContext;
+				var assignedName = httpContext!.User.Claims.First(i => i.Type == ClaimTypes.Name).Value;
+
+				Assert.That(assignedName, Is.EqualTo(name));
+			});
+		}
+
+		[Test]
+		public async Task HttpContext_IsClearedInNewTest()
+		{
+			// Arrange
+			var name = Guid.NewGuid().ToString();
+
+			// Act
+
+			// Assert
+			await ScopeAsync(async services =>
+			{
+				var httpContext = services.GetRequiredService<IHttpContextAccessor>().HttpContext;
+				var nameClaim = httpContext!.User.Claims.FirstOrDefault(i => i.Type == ClaimTypes.Name);
+
+				Assert.That(nameClaim, Is.Null);
 			});
 		}
 	}
