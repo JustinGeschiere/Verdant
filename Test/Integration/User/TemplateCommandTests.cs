@@ -1,6 +1,6 @@
 ﻿using Data;
 using Data.Entities;
-using Feature.User;
+using Feature.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,15 +9,15 @@ using Test.Framework.Services.Abstractions;
 
 namespace Test.Integration.User
 {
-	public class CreateUserCommandTests : VerdantFixture
+	public class TemplateCommandTests : VerdantFixture
 	{
 		[Test]
 		public async Task ValidRequest_ReturnsSuccess()
 		{
 			// Arrange
-			var request = new CreateUserCommand.Request()
+			var request = new TemplateCommand.Request()
 			{
-				EmailAddress = "tester@test.com"
+				Email = "tester@test.com"
 			};
 
 			// Act
@@ -27,7 +27,7 @@ namespace Test.Integration.User
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(CreateUserCommand.ResultStatus.Success));
+				Assert.That(result.Status, Is.EqualTo(TemplateCommand.ResultStatus.Success));
 			}
 		}
 
