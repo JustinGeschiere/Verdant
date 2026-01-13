@@ -7,34 +7,25 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Feature.Users
 {
-	public class RegisterUserCommand
+	public class RequestResetPasswordCommand
 	{
 		public record Request : IRequest<Result>
 		{
 			[Required]
 			public required Guid? UserId { get; init; }
-
-			[Required(AllowEmptyStrings = false)]
-			public required string RegisterToken { get; init; }
-
-			[Required(AllowEmptyStrings = false)]
-			[DataType(DataType.Password)]
-			public required string Password { get; init; }
-
-			[DataType(DataType.Password)]
-			[Compare("Password")]
-			public required string ConfirmPassword { get; init; }
 		}
 
 		public record Result(ResultStatus status) : BaseResult<ResultStatus>(status)
-		{ }
+		{
+			public Guid? UserId { get; init; }
+
+			public string? Token { get; init; }
+		}
 
 		public enum ResultStatus
 		{
 			Success,
-			NotFound,
-			InvalidPassword,
-			InvalidToken
+			NotFound
 		}
 
 		public class Handler : IRequestHandler<Request, Result>
@@ -50,25 +41,18 @@ namespace Feature.Users
 
 			public async Task<Result> Handle(Request request, CancellationToken cancellationToken)
 			{
-				var user = await _userManager.FindByIdAsync(request.UserId.ToString() ?? string.Empty);
+				var user = await _userManager.FindByIdAsync(request.UserId.ToString()!);
 				if (user == null)
 				{
+					_logger.LogWarning("Password reset requested for user with id '{UserId}' that does not exist", request.UserId);
 					return new Result(ResultStatus.NotFound);
 				}
 
-				var passwordResult = await _userManager.AddPasswordAsync(user, request.Password);
-				if (!passwordResult.Succeeded)
+				return new Result(ResultStatus.Success)
 				{
-					return new Result(ResultStatus.InvalidPassword);
-				}
-
-				var confirmResult = await _userManager.ConfirmEmailAsync(user, request.RegisterToken);
-				if (!confirmResult.Succeeded)
-				{
-					return new Result(ResultStatus.InvalidToken);
-				}
-
-				return new Result(ResultStatus.Success);
+					UserId = user.Id,
+					Token = await _userManager.GeneratePasswordResetTokenAsync(user)
+				};
 			}
 		}
 	}

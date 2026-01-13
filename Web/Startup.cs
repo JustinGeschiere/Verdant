@@ -3,6 +3,7 @@ using Core.Options;
 using Data;
 using Data.Entities;
 using Feature.Extensions;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Web.Extensions;
@@ -19,6 +20,12 @@ public class Startup(IConfiguration configuration)
 		// Mediatr registration
 		services.AddVerdantFeatures();
 
+		services.AddHttpContextAccessor();
+
+		services.AddDataProtection()
+			.PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, "data-protection-keys")))
+			.SetApplicationName("Verdant");
+
 		// Database
 		var sqlOptions = configuration.GetSection(SqlOptions.SECTION)
 			.Get<SqlOptions>() ?? throw new InvalidOperationException($"Section {SqlOptions.SECTION} with type '{nameof(SqlOptions)}' not configured.");
@@ -28,13 +35,12 @@ public class Startup(IConfiguration configuration)
 		// Identity
 		services.AddIdentity<User, Role>(options =>
 			{
+				options.User.RequireUniqueEmail = true;
 				options.SignIn.RequireConfirmedAccount = true;
 				options.UseVerdantPasswordRequirements();
 			})
 			.AddEntityFrameworkStores<VerdantContext>()
 			.AddDefaultTokenProviders();
-
-		services.AddHttpContextAccessor();
 
 		services.AddControllersWithViews();
 

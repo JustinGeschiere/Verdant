@@ -1,4 +1,5 @@
 ﻿using Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Framework;
 
@@ -10,6 +11,11 @@ namespace Test
 		protected override void ConfigureOverrideServices(IServiceCollection services)
 		{
 			base.ConfigureOverrideServices(services);
+
+			services.Configure<DataProtectionTokenProviderOptions>(options =>
+			{
+				options.TokenLifespan = TimeSpan.FromSeconds(5);
+			});
 		}
 	}
 }

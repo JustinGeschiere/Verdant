@@ -19,7 +19,7 @@ namespace Feature.Users
 		{
 			public Guid? UserId { get; init; }
 
-			public string? RegisterToken { get; init; }
+			public string? Token { get; init; }
 		}
 
 		public enum ResultStatus
@@ -33,31 +33,49 @@ namespace Feature.Users
 		public class Handler : IRequestHandler<Request, Result>
 		{
 			private readonly UserManager<User> _userManager;
+			private readonly IMediator _mediator;
 			private readonly ILogger _logger;
 
-			public Handler(UserManager<User> userManager, ILogger<TemplateCommand> logger)
+			public Handler(UserManager<User> userManager, IMediator mediator, ILogger<TemplateCommand> logger)
 			{
 				_userManager = userManager;
+				_mediator = mediator;
 				_logger = logger;
 			}
 
 			public async Task<Result> Handle(Request request, CancellationToken cancellationToken)
 			{
 				var existingUser = await _userManager.FindByEmailAsync(request.Email);
-				if (existingUser != null && existingUser.EmailConfirmed)
+				if (existingUser != null)
 				{
-					_logger.LogWarning("User with e-mail '{Email}' already exists.", request.Email);
-					return new Result(ResultStatus.AlreadyExists);
-				}
-				else if (existingUser != null && !existingUser.EmailConfirmed)
-				{
-					// HACK: Normally we would send an e-mail, but for this project we just display the registration link
-					_logger.LogInformation("Recreating registration for user with e-mail '{Email}'.", request.Email);
-					return new Result(ResultStatus.SuccessWithResend)
+					var hasPassword = await _userManager.HasPasswordAsync(existingUser);
+
+					if (hasPassword)
 					{
-						UserId = existingUser.Id,
-						RegisterToken = await _userManager.GenerateEmailConfirmationTokenAsync(existingUser)
-					};
+						return new Result(ResultStatus.AlreadyExists);
+					}
+					else
+					{
+						var resendPasswordTokenRequest = new RequestResetPasswordCommand.Request()
+						{ 
+							UserId = existingUser.Id 
+						};
+
+						var resendResult = await _mediator.Send(resendPasswordTokenRequest);
+						if (resendResult.Status == RequestResetPasswordCommand.ResultStatus.Success)
+						{
+							return new Result(ResultStatus.SuccessWithResend)
+							{
+								UserId = resendResult.UserId,
+								Token = resendResult.Token
+							};
+						}
+						else
+						{
+							_logger.LogError("Something went wrong while creating password reset token for existing user with e-mail '{Email}'.", request.Email);
+							return new Result(ResultStatus.GeneralError);
+						}
+					}
 				}
 
 				var user = new User()
@@ -73,13 +91,25 @@ namespace Feature.Users
 					return new Result(ResultStatus.GeneralError);
 				}
 
-				// HACK: Normally we would send an e-mail, but for this project we just display the registration link
-				_logger.LogInformation("Creating registration for user with e-mail '{Email}'.", request.Email);
-				return new Result(ResultStatus.Success)
+				var passwordTokenRequest = new RequestResetPasswordCommand.Request()
 				{
-					UserId = user.Id,
-					RegisterToken = await _userManager.GenerateEmailConfirmationTokenAsync(user)
+					UserId = user.Id
 				};
+
+				var requestResult = await _mediator.Send(passwordTokenRequest);
+				if (requestResult.Status == RequestResetPasswordCommand.ResultStatus.Success)
+				{
+					return new Result(ResultStatus.Success)
+					{
+						UserId = requestResult.UserId,
+						Token = requestResult.Token
+					};
+				}
+				else
+				{
+					_logger.LogError("Something went wrong while creating password reset token for new user with e-mail '{Email}'.", request.Email);
+					return new Result(ResultStatus.GeneralError);
+				}
 			}
 		}
 	}
