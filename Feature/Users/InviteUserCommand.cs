@@ -51,9 +51,9 @@ namespace Feature.Users
 				}
 				else if (existingUser != null && !existingUser.EmailConfirmed)
 				{
-					// Normally we would send an e-mail, but for this project we just display the registration
+					// HACK: Normally we would send an e-mail, but for this project we just display the registration link
 					_logger.LogInformation("Recreating registration for user with e-mail '{Email}'.", request.Email);
-					return new Result(ResultStatus.Success)
+					return new Result(ResultStatus.SuccessWithResend)
 					{
 						UserId = existingUser.Id,
 						RegisterToken = await _userManager.GenerateEmailConfirmationTokenAsync(existingUser)
@@ -73,7 +73,7 @@ namespace Feature.Users
 					return new Result(ResultStatus.GeneralError);
 				}
 
-				// Normally we would send an e-mail, but for this project we just display the registration
+				// HACK: Normally we would send an e-mail, but for this project we just display the registration link
 				_logger.LogInformation("Creating registration for user with e-mail '{Email}'.", request.Email);
 				return new Result(ResultStatus.Success)
 				{
