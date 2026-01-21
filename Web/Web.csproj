@@ -8,10 +8,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="libman.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="libman.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+	<PackageReference Include="Microsoft.Web.LibraryManager.Build" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
 
@@ -19,6 +28,10 @@
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
     <ProjectReference Include="..\Feature\Feature.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 
 </Project>
