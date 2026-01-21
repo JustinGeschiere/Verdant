@@ -419,3 +419,6 @@ FodyWeavers.xsd
 
 # Dependency containers volume binding
 .ci/dependencies/.storage/
+
+# Client-side libraries (we manage these with libman)
+Web/wwwroot/lib
