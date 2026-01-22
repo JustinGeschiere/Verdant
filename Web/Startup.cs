@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Web.Extensions;
+using Web.SetUpTasks;
+using Web.SetUpTasks.Abstractions;
 
 namespace Web;
 
@@ -44,8 +46,8 @@ public class Startup(IConfiguration configuration)
 
 		services.AddControllersWithViews();
 
-		// Setup functionalities like database migrations
-		services.AddHostedService<SetUp>();
+		// Setup functionalities
+		services.AddVerdantSetUp();
 	}
 
 	public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

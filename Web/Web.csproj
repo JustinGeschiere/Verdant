@@ -8,14 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="libman.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="libman.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" />

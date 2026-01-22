@@ -1,4 +1,4 @@
-namespace SnackTrace2.Models
+namespace Web.Models
 {
     public class ErrorViewModel
     {
