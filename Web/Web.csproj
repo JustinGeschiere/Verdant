@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Views\MailTemplates\" />
     <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 
