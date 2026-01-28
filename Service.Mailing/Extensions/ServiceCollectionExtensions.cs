@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Service.Mailing.Abstractions;
 using Service.Mailing.Options;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,9 @@ namespace Service.Mailing.Extensions
                 .Bind(configuration.GetSection(SmtpOptions.SECTION))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
+
+            services.AddScoped<IMailRenderer, BlazorMailRenderer>();
+            services.AddScoped<IMailSender, MailKitMailSender>();
 
             return services;
         }

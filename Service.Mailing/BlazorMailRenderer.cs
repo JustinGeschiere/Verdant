@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Service.Mailing.Abstractions;
 
 namespace Service.Mailing
 {
-    internal class BlazorMailRenderer
+    internal class BlazorMailRenderer : IMailRenderer
     {
         private readonly IServiceProvider _serviceProvider;
 
@@ -14,7 +15,7 @@ namespace Service.Mailing
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<string> RenderAsync<TComponent>(IDictionary<string, object?> parameters)
+        public async Task<string> RenderAsync<TComponent>(IMailTemplate<TComponent> template)
             where TComponent : IComponent
         {
             await using var scope = _serviceProvider.CreateAsyncScope();
@@ -23,7 +24,7 @@ namespace Service.Mailing
             var renderer = new HtmlRenderer(scope.ServiceProvider, loggerFactory);
 
             var result = await renderer.Dispatcher.InvokeAsync(() =>
-                renderer.RenderComponentAsync<TComponent>(ParameterView.FromDictionary(parameters)));
+                renderer.RenderComponentAsync<TComponent>(template.ToParameters()));
 
             return result.ToHtmlString();
         }

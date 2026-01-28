@@ -14,13 +14,14 @@ namespace Service.Mailing.Options
 
         public bool UseSsl { get; set; }
 
-        [Required]
         public string Username { get; set; } = default!;
 
-        [Required]
         public string Password { get; set; } = default!;
 
         [Required, EmailAddress]
-        public string From { get; set; } = default!;
+        public string FromEmail { get; set; } = default!;
+
+        [Required]
+        public string FromName { get; set; } = default!;
     }
 }
