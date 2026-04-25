@@ -1,4 +1,4 @@
-﻿using Data.Entities;
+﻿using Domain.Users;
 using Feature.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;

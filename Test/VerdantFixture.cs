@@ -1,4 +1,4 @@
-﻿using Data;
+﻿using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Framework;

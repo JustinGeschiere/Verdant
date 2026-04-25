@@ -1,4 +1,4 @@
-﻿using Data;
+﻿using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web

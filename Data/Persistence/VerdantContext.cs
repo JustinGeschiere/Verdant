@@ -1,8 +1,11 @@
-﻿using Data.Entities;
+﻿using Domain.Plants;
+using Domain.Roles;
+using Domain.UserPlant;
+using Domain.Users;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Data;
+namespace Infrastructure.Persistence;
 
 public class VerdantContext(DbContextOptions<VerdantContext> options) : IdentityDbContext<User, Role, Guid>(options)
 {

@@ -1,8 +1,9 @@
 ﻿using Core.Extensions;
 using Core.Options;
-using Data;
-using Data.Entities;
+using Domain.Roles;
+using Domain.Users;
 using Feature.Extensions;
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

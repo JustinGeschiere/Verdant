@@ -1,4 +1,7 @@
-﻿namespace Data.Entities
+﻿using Domain.Plants;
+using Domain.Users;
+
+namespace Domain.UserPlants
 {
 	public class UserPlant
 	{

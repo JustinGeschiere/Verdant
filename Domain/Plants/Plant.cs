@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Domain.UserPlants;
+using System.ComponentModel.DataAnnotations;
 
-namespace Data.Entities
+namespace Domain.Plants
 {
 	public class Plant
 	{

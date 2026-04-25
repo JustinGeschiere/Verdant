@@ -1,4 +1,4 @@
-﻿using Data;
+﻿using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
