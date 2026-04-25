@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\MailTemplates\**" />
+    <Content Remove="Views\MailTemplates\**" />
+    <EmbeddedResource Remove="Views\MailTemplates\**" />
+    <None Remove="Views\MailTemplates\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" />
@@ -23,7 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\MailTemplates\" />
     <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 
