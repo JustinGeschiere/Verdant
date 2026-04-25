@@ -1,20 +1,26 @@
 ﻿using Domain.UserPlants;
 using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Users;
 
 public class User : IdentityUser<Guid>
 {
-	[StringLength(128)]
-	public string? FirstName { get; set; }
+	public string? FirstName { get; private set; }
 
-	[StringLength(128)]
-	public string? LastName { get; set; }
+	public string? LastName { get; private set; }
 
-	public ICollection<UserPlant> UserPlants { get; set; } = new List<UserPlant>();
 
-	[NotMapped]
+	private List<UserPlant> _userPlants = new();
+	public IReadOnlyCollection<UserPlant> UserPlants => _userPlants;
+
 	public string FullName => $"{FirstName} {LastName}".Trim();
+
+	private User()
+	{ }
+
+	public User(string? firstName, string? lastName)
+	{
+		FirstName = firstName;
+		LastName = lastName;
+	}
 }

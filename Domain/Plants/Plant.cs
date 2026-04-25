@@ -1,4 +1,5 @@
-﻿using Domain.UserPlants;
+﻿using Domain.Plants.ValueObjects;
+using Domain.UserPlants;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Plants
@@ -6,22 +7,20 @@ namespace Domain.Plants
 	public class Plant
 	{
 		[Key]
-		public Guid Id { get; set; }
+		public Guid Id { get; private set; }
 
-		[StringLength(256)]
-		[Required(AllowEmptyStrings = false)]
-		public required string GivenName { get; set; }
+		public PlantName Name { get; private set; } = null!;
 
-		[StringLength(256)]
-		[Required(AllowEmptyStrings = false)]
-		public required string ScientificName { get; set; }
+		private readonly List<UserPlant> _userPlants = new();
+		public IReadOnlyCollection<UserPlant> UserPlants => _userPlants;
 
-		public required TimeSpan SummerWateringInterval { get; set; }
+		private Plant()
+		{ }
 
-		public required TimeSpan WinterWateringInterval { get; set; }
-
-		public DateTime? LastWateredDate { get; set; }
-
-		public ICollection<UserPlant> UserPlants { get; set; } = new List<UserPlant>();
+		public Plant(PlantName name)
+		{
+			Id = Guid.NewGuid();
+			Name = name;
+		}
 	}
 }
