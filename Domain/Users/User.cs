@@ -18,9 +18,26 @@ public class User : IdentityUser<Guid>
 	private User()
 	{ }
 
+	public User(string email)
+	{
+		UserName = email;
+		Email = email;
+	}
+
 	public User(string? firstName, string? lastName)
 	{
 		FirstName = firstName;
 		LastName = lastName;
+	}
+
+	public void Activate(string? firstName, string? lastName)
+	{
+		FirstName = firstName;
+		LastName = lastName;
+
+		if (!EmailConfirmed)
+		{
+			EmailConfirmed = true;
+		}
 	}
 }

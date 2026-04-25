@@ -19,7 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Data\Infrastructure.csproj" />
-    <ProjectReference Include="..\Feature\Feature.csproj" />
+    <ProjectReference Include="..\Feature\Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

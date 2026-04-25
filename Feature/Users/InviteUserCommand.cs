@@ -1,4 +1,4 @@
-﻿using Data.Entities;
+﻿using Domain.Users;
 using Feature.Framework;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -36,7 +36,7 @@ namespace Feature.Users
 			private readonly IMediator _mediator;
 			private readonly ILogger _logger;
 
-			public Handler(UserManager<User> userManager, IMediator mediator, ILogger<TemplateCommand> logger)
+			public Handler(UserManager<User> userManager, IMediator mediator, ILogger<InviteUserCommand> logger)
 			{
 				_userManager = userManager;
 				_mediator = mediator;
@@ -57,8 +57,8 @@ namespace Feature.Users
 					else
 					{
 						var resendPasswordTokenRequest = new RequestResetPasswordCommand.Request()
-						{ 
-							UserId = existingUser.Id 
+						{
+							UserId = existingUser.Id
 						};
 
 						var resendResult = await _mediator.Send(resendPasswordTokenRequest);
@@ -78,11 +78,7 @@ namespace Feature.Users
 					}
 				}
 
-				var user = new User()
-				{
-					UserName = request.Email,
-					Email = request.Email
-				};
+				var user = new User(request.Email);
 
 				var createResult = await _userManager.CreateAsync(user);
 				if (!createResult.Succeeded)

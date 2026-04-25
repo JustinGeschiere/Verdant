@@ -1,9 +1,8 @@
-﻿using Data.Entities;
+﻿using Domain.Users;
 using Feature.Framework;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Feature.Users
@@ -44,7 +43,7 @@ namespace Feature.Users
 			private readonly UserManager<User> _userManager;
 			private readonly ILogger _logger;
 
-			public Handler(UserManager<User> userManager, ILogger<TemplateCommand> logger)
+			public Handler(UserManager<User> userManager, ILogger<ConfirmResetPasswordCommand> logger)
 			{
 				_userManager = userManager;
 				_logger = logger;

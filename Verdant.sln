@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Data\Infrastructure.csproj", "{8FF51969-CEFC-4530-A1AA-DD46EADAE986}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Feature", "Feature\Feature.csproj", "{B99E8A81-D7B5-4E81-AF29-7A4B4F6FE3AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Feature\Application.csproj", "{B99E8A81-D7B5-4E81-AF29-7A4B4F6FE3AD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{22613D3D-B429-4F06-95A2-8FC433CD5A01}"
 EndProject
