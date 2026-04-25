@@ -1,6 +1,6 @@
-﻿using Domain.Roles;
+﻿using Application.Features.Users.InviteUser;
+using Domain.Roles;
 using Domain.Users;
-using Feature.Users;
 using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Identity;

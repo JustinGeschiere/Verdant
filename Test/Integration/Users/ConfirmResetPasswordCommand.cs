@@ -1,5 +1,7 @@
-﻿using Domain.Users;
-using Feature.Users;
+﻿using Application.Features.Users.ConfirmResetPassword;
+using Application.Features.Users.InviteUser;
+using Application.Features.Users.RequestResetPassword;
+using Domain.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,7 +18,7 @@ namespace Test.Integration.Users
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var request = new ConfirmResetPasswordCommand.Request()
+			var request = new ConfirmResetPasswordHandler.Request()
 			{
 				UserId = inviteResult.UserId,
 				Token = inviteResult.Token!,
@@ -31,7 +33,7 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordCommand.ResultStatus.Success));
+				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordHandler.ResultStatus.Success));
 
 				await ScopeAsync(async services =>
 				{
@@ -51,7 +53,7 @@ namespace Test.Integration.Users
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var confirmRequest = new ConfirmResetPasswordCommand.Request()
+			var confirmRequest = new ConfirmResetPasswordHandler.Request()
 			{
 				UserId = inviteResult.UserId,
 				Token = inviteResult.Token!,
@@ -61,12 +63,12 @@ namespace Test.Integration.Users
 
 			var confirmResult = await SendAsync(confirmRequest);
 
-			var tokenRequest = new RequestResetPasswordCommand.Request()
+			var tokenRequest = new RequestResetPasswordHandler.Request()
 			{ UserId = inviteResult.UserId };
 
 			var tokenResult = await SendAsync(tokenRequest);
 
-			var request = new ConfirmResetPasswordCommand.Request()
+			var request = new ConfirmResetPasswordHandler.Request()
 			{
 				UserId = tokenResult.UserId,
 				Token = tokenResult.Token!,
@@ -81,7 +83,7 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordCommand.ResultStatus.Success));
+				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordHandler.ResultStatus.Success));
 
 				await ScopeAsync(async services =>
 				{
@@ -96,7 +98,7 @@ namespace Test.Integration.Users
 		public async Task NoUser_ReturnsNotFound()
 		{
 			// Arrange
-			var request = new ConfirmResetPasswordCommand.Request()
+			var request = new ConfirmResetPasswordHandler.Request()
 			{ 
 				UserId = Guid.NewGuid(),
 				Token = "someToken",
@@ -111,7 +113,7 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordCommand.ResultStatus.NotFound));
+				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordHandler.ResultStatus.NotFound));
 			}
 		}
 
@@ -124,7 +126,7 @@ namespace Test.Integration.Users
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var request = new ConfirmResetPasswordCommand.Request()
+			var request = new ConfirmResetPasswordHandler.Request()
 			{
 				UserId = inviteResult.UserId,
 				Token = "someToken",
@@ -139,7 +141,7 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordCommand.ResultStatus.InvalidToken));
+				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordHandler.ResultStatus.InvalidToken));
 			}
 		}
 
@@ -152,7 +154,7 @@ namespace Test.Integration.Users
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var confirmRequest = new ConfirmResetPasswordCommand.Request()
+			var confirmRequest = new ConfirmResetPasswordHandler.Request()
 			{
 				UserId = inviteResult.UserId,
 				Token = inviteResult.Token!,
@@ -169,7 +171,7 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordCommand.ResultStatus.InvalidToken));
+				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordHandler.ResultStatus.InvalidToken));
 			}
 		}
 
@@ -182,7 +184,7 @@ namespace Test.Integration.Users
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var request = new ConfirmResetPasswordCommand.Request()
+			var request = new ConfirmResetPasswordHandler.Request()
 			{
 				UserId = inviteResult.UserId,
 				Token = inviteResult.Token!,
@@ -200,7 +202,7 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordCommand.ResultStatus.InvalidToken));
+				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordHandler.ResultStatus.InvalidToken));
 			}
 		}
 
@@ -216,7 +218,7 @@ namespace Test.Integration.Users
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var request = new ConfirmResetPasswordCommand.Request()
+			var request = new ConfirmResetPasswordHandler.Request()
 			{
 				UserId = inviteResult.UserId,
 				Token = inviteResult.Token!,
@@ -231,7 +233,7 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordCommand.ResultStatus.InvalidPassword));
+				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordHandler.ResultStatus.InvalidPassword));
 			}
 		}
 	}

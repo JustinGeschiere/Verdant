@@ -1,5 +1,6 @@
-﻿using Domain.Users;
-using Feature.Users;
+﻿using Application.Features.Users.ConfirmResetPassword;
+using Application.Features.Users.InviteUser;
+using Domain.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -75,7 +76,7 @@ namespace Test.Integration.Users
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var registerRequest = new ConfirmResetPasswordCommand.Request()
+			var registerRequest = new ConfirmResetPasswordHandler.Request()
 			{
 				UserId = inviteResult.UserId,
 				Token = inviteResult.Token!,
