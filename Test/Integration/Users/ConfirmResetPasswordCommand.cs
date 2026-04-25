@@ -1,4 +1,5 @@
-﻿using Application.Features.Users.ConfirmResetPassword;
+﻿using Application.Common.Errors;
+using Application.Features.Users.ConfirmResetPassword;
 using Application.Features.Users.InviteUser;
 using Application.Features.Users.RequestResetPassword;
 using Domain.Users;
@@ -13,15 +14,15 @@ namespace Test.Integration.Users
 		public async Task InvitedUser_ReturnsSuccess()
 		{
 			// Arrange
-			var inviteRequest = new InviteUserCommand.Request()
+			var inviteRequest = new InviteUserCommand()
 			{ Email = "tester@test.com" };
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var request = new ConfirmResetPasswordHandler.Request()
+			var request = new ConfirmResetPasswordCommand()
 			{
-				UserId = inviteResult.UserId,
-				Token = inviteResult.Token!,
+				UserId = inviteResult.Value!.UserId,
+				Token = inviteResult.Value!.Token,
 				Password = "P@$$w0rd!",
 				ConfirmPassword = "P@$$w0rd!"
 			};
@@ -33,12 +34,12 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordHandler.ResultStatus.Success));
+				Assert.That(result.IsSuccess, Is.True);
 
 				await ScopeAsync(async services =>
 				{
 					var userManager = services.GetRequiredService<UserManager<User>>();
-					var user = await userManager.FindByIdAsync(inviteResult.UserId.ToString()!);
+					var user = await userManager.FindByIdAsync(inviteResult.Value!.UserId.ToString()!);
 					Assert.That(await userManager.HasPasswordAsync(user!), Is.True);
 				});
 			}
@@ -48,30 +49,30 @@ namespace Test.Integration.Users
 		public async Task ExistingUser_ReturnsSuccess()
 		{
 			// Arrange
-			var inviteRequest = new InviteUserCommand.Request()
+			var inviteRequest = new InviteUserCommand()
 			{ Email = "tester@test.com" };
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var confirmRequest = new ConfirmResetPasswordHandler.Request()
+			var confirmRequest = new ConfirmResetPasswordCommand()
 			{
-				UserId = inviteResult.UserId,
-				Token = inviteResult.Token!,
+				UserId = inviteResult.Value!.UserId,
+				Token = inviteResult.Value!.Token,
 				Password = "P@$$w0rd!",
 				ConfirmPassword = "P@$$w0rd!"
 			};
 
 			var confirmResult = await SendAsync(confirmRequest);
 
-			var tokenRequest = new RequestResetPasswordHandler.Request()
-			{ UserId = inviteResult.UserId };
+			var tokenRequest = new RequestResetPasswordCommand()
+			{ UserId = inviteResult.Value!.UserId };
 
 			var tokenResult = await SendAsync(tokenRequest);
 
-			var request = new ConfirmResetPasswordHandler.Request()
+			var request = new ConfirmResetPasswordCommand()
 			{
-				UserId = tokenResult.UserId,
-				Token = tokenResult.Token!,
+				UserId = tokenResult.Value!.UserId,
+				Token = tokenResult.Value!.Token,
 				Password = "P@$$w0rd!",
 				ConfirmPassword = "P@$$w0rd!"
 			};
@@ -83,12 +84,12 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordHandler.ResultStatus.Success));
+				Assert.That(result.IsSuccess, Is.True);
 
 				await ScopeAsync(async services =>
 				{
 					var userManager = services.GetRequiredService<UserManager<User>>();
-					var user = await userManager.FindByIdAsync(inviteResult.UserId.ToString()!);
+					var user = await userManager.FindByIdAsync(inviteResult.Value!.UserId.ToString()!);
 					Assert.That(await userManager.HasPasswordAsync(user!), Is.True);
 				});
 			}
@@ -98,7 +99,7 @@ namespace Test.Integration.Users
 		public async Task NoUser_ReturnsNotFound()
 		{
 			// Arrange
-			var request = new ConfirmResetPasswordHandler.Request()
+			var request = new ConfirmResetPasswordCommand()
 			{ 
 				UserId = Guid.NewGuid(),
 				Token = "someToken",
@@ -113,7 +114,8 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordHandler.ResultStatus.NotFound));
+				Assert.That(result.IsSuccess, Is.False);
+				Assert.That(result.Error, Is.EqualTo(UserErrors.NotFound));
 			}
 		}
 
@@ -121,14 +123,14 @@ namespace Test.Integration.Users
 		public async Task InvalidToken_ReturnsInvalidToken()
 		{
 			// Arrange
-			var inviteRequest = new InviteUserCommand.Request()
+			var inviteRequest = new InviteUserCommand()
 			{ Email = "tester@test.com" };
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var request = new ConfirmResetPasswordHandler.Request()
+			var request = new ConfirmResetPasswordCommand()
 			{
-				UserId = inviteResult.UserId,
+				UserId = inviteResult.Value!.UserId,
 				Token = "someToken",
 				Password = "P@$$w0rd!",
 				ConfirmPassword = "P@$$w0rd!"
@@ -141,7 +143,8 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordHandler.ResultStatus.InvalidToken));
+				Assert.That(result.IsSuccess, Is.False);
+				Assert.That(result.Error, Is.EqualTo(UserErrors.InvalidToken));
 			}
 		}
 
@@ -149,15 +152,15 @@ namespace Test.Integration.Users
 		public async Task AlreadyConsumedToken_ReturnsInvalidToken()
 		{
 			// Arrange
-			var inviteRequest = new InviteUserCommand.Request()
+			var inviteRequest = new InviteUserCommand()
 			{ Email = "tester@test.com" };
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var confirmRequest = new ConfirmResetPasswordHandler.Request()
+			var confirmRequest = new ConfirmResetPasswordCommand()
 			{
-				UserId = inviteResult.UserId,
-				Token = inviteResult.Token!,
+				UserId = inviteResult.Value!.UserId,
+				Token = inviteResult.Value!.Token!,
 				Password = "P@$$w0rd!",
 				ConfirmPassword = "P@$$w0rd!"
 			};
@@ -171,7 +174,8 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordHandler.ResultStatus.InvalidToken));
+				Assert.That(result.IsSuccess, Is.False);
+				Assert.That(result.Error, Is.EqualTo(UserErrors.InvalidToken));
 			}
 		}
 
@@ -179,15 +183,15 @@ namespace Test.Integration.Users
 		public async Task ExpiredToken_ReturnsInvalidToken()
 		{
 			// Arrange
-			var inviteRequest = new InviteUserCommand.Request()
+			var inviteRequest = new InviteUserCommand()
 			{ Email = "tester@test.com" };
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var request = new ConfirmResetPasswordHandler.Request()
+			var request = new ConfirmResetPasswordCommand()
 			{
-				UserId = inviteResult.UserId,
-				Token = inviteResult.Token!,
+				UserId = inviteResult.Value!.UserId,
+				Token = inviteResult.Value!.Token,
 				Password = "P@$$w0rd!",
 				ConfirmPassword = "P@$$w0rd!"
 			};
@@ -202,26 +206,26 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordHandler.ResultStatus.InvalidToken));
+				Assert.That(result.IsSuccess, Is.False);
+				Assert.That(result.Error, Is.EqualTo(UserErrors.InvalidToken));
 			}
 		}
 
-		[TestCase("")]
 		[TestCase("P@$$w0!")]
 		[TestCase("12345678")]
 		[TestCase("abcdefg1@")]
 		public async Task InvalidPassword_ReturnsInvalidPassword(string password)
 		{
 			// Arrange
-			var inviteRequest = new InviteUserCommand.Request()
+			var inviteRequest = new InviteUserCommand()
 			{ Email = "tester@test.com" };
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var request = new ConfirmResetPasswordHandler.Request()
+			var request = new ConfirmResetPasswordCommand()
 			{
-				UserId = inviteResult.UserId,
-				Token = inviteResult.Token!,
+				UserId = inviteResult.Value!.UserId,
+				Token = inviteResult.Value!.Token,
 				Password = password,
 				ConfirmPassword = password
 			};
@@ -233,7 +237,8 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(ConfirmResetPasswordHandler.ResultStatus.InvalidPassword));
+				Assert.That(result.IsSuccess, Is.False);
+				Assert.That(result.Error, Is.EqualTo(UserErrors.InvalidPassword));
 			}
 		}
 	}

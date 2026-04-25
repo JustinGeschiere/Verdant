@@ -1,4 +1,5 @@
-﻿using Application.Features.Users.ConfirmResetPassword;
+﻿using Application.Common.Errors;
+using Application.Features.Users.ConfirmResetPassword;
 using Application.Features.Users.InviteUser;
 using Application.Features.Users.RequestResetPassword;
 
@@ -10,13 +11,13 @@ namespace Test.Integration.Users
 		public async Task InvitedUser_ReturnsSuccess()
 		{
 			// Arrange
-			var inviteRequest = new InviteUserCommand.Request()
+			var inviteRequest = new InviteUserCommand()
 			{ Email = "tester@test.com" };
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var request = new RequestResetPasswordHandler.Request()
-			{ UserId = inviteResult.UserId };
+			var request = new RequestResetPasswordCommand()
+			{ UserId = inviteResult.Value!.UserId };
 
 			// Act
 			var result = await SendAsync(request);
@@ -25,9 +26,9 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(RequestResetPasswordHandler.ResultStatus.Success));
-				Assert.That(result.UserId, Is.Not.Null);
-				Assert.That(result.Token, Is.Not.Null.And.Not.WhiteSpace);
+				Assert.That(result.IsSuccess, Is.True);
+				Assert.That(result.Value?.UserId, Is.Not.Null);
+				Assert.That(result.Value?.Token, Is.Not.Null.And.Not.WhiteSpace);
 			}
 		}
 
@@ -35,23 +36,23 @@ namespace Test.Integration.Users
 		public async Task ExistingUser_ReturnsSuccess()
 		{
 			// Arrange
-			var inviteRequest = new InviteUserCommand.Request()
+			var inviteRequest = new InviteUserCommand()
 			{ Email = "tester@test.com" };
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var registerRequest = new ConfirmResetPasswordHandler.Request()
+			var registerRequest = new ConfirmResetPasswordCommand()
 			{
-				UserId = inviteResult.UserId,
-				Token = inviteResult.Token!,
+				UserId = inviteResult.Value!.UserId,
+				Token = inviteResult.Value!.Token,
 				Password = "P@$$w0rd!",
 				ConfirmPassword = "P@$$w0rd!"
 			};
 
 			var registerResult = await SendAsync(registerRequest);
 
-			var request = new RequestResetPasswordHandler.Request()
-			{ UserId = inviteResult.UserId };
+			var request = new RequestResetPasswordCommand()
+			{ UserId = inviteResult.Value!.UserId };
 
 			// Act
 			var result = await SendAsync(request);
@@ -60,9 +61,9 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(RequestResetPasswordHandler.ResultStatus.Success));
-				Assert.That(result.UserId, Is.Not.Null);
-				Assert.That(result.Token, Is.Not.Null.And.Not.WhiteSpace);
+				Assert.That(result.IsSuccess, Is.True);
+				Assert.That(result.Value?.UserId, Is.Not.Null);
+				Assert.That(result.Value?.Token, Is.Not.Null.And.Not.WhiteSpace);
 			}
 		}
 
@@ -70,7 +71,7 @@ namespace Test.Integration.Users
 		public async Task NoUser_ReturnsNotFound()
 		{
 			// Arrange
-			var request = new RequestResetPasswordHandler.Request()
+			var request = new RequestResetPasswordCommand()
 			{ UserId = Guid.NewGuid() };
 
 			// Act
@@ -80,7 +81,8 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(RequestResetPasswordHandler.ResultStatus.NotFound));
+				Assert.That(result.IsSuccess, Is.False);
+				Assert.That(result.Error, Is.EqualTo(UserErrors.NotFound));
 			}
 		}
 	}

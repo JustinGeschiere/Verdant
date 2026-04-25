@@ -43,21 +43,21 @@ namespace Web.SetUpTasks
 					var systemUserEmail = "system@verdant.com";
 
 					// TODO: Do we want to rely on the invite feature here?
-					var request = new InviteUserCommand.Request()
+					var request = new InviteUserCommand()
 					{
 						Email = systemUserEmail
 					};
 
 					var result = await _mediator.Send(request);
 
-					if (result.Status is InviteUserCommand.ResultStatus.Success or InviteUserCommand.ResultStatus.SuccessWithResend)
+					if (result.IsSuccess)
 					{
-						var systemUser = await _userManager.FindByIdAsync(result.UserId.ToString()!);
+						var systemUser = await _userManager.FindByIdAsync(result.Value!.UserId.ToString()!);
 
 						var roleResult = await _userManager.AddToRoleAsync(systemUser!, VerdantRoles.System);
 						if (roleResult.Succeeded)
 						{
-							_logger.LogInformation("Invited system user account with user id '{UserID}' and registration token '{Token}'", result.UserId, result.Token);
+							_logger.LogInformation("Invited system user account with user id '{UserID}' and registration token '{Token}'", result.Value!.UserId, result.Value!.Token);
 						}
 						else
 						{
@@ -66,7 +66,7 @@ namespace Web.SetUpTasks
 					}
 					else
 					{
-						throw new InvalidOperationException($"System user was not created with status '{result.Status}'");
+						throw new InvalidOperationException($"System user was not created with status '{result.Error!.Message}'");
 					}
 				}
 			}

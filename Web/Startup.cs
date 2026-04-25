@@ -1,15 +1,13 @@
-﻿using Core.Extensions;
+﻿using Application.Composition;
+using Core.Extensions;
 using Core.Options;
 using Domain.Roles;
 using Domain.Users;
-using Feature.Extensions;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Web.Extensions;
-using Web.SetUpTasks;
-using Web.SetUpTasks.Abstractions;
 
 namespace Web;
 

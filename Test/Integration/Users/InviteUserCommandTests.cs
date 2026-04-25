@@ -1,4 +1,5 @@
-﻿using Application.Features.Users.ConfirmResetPassword;
+﻿using Application.Common.Errors;
+using Application.Features.Users.ConfirmResetPassword;
 using Application.Features.Users.InviteUser;
 using Domain.Users;
 using Microsoft.AspNetCore.Identity;
@@ -13,7 +14,7 @@ namespace Test.Integration.Users
 		{
 			// Arrange
 			var userEmail = "tester@test.com";
-			var request = new InviteUserCommand.Request()
+			var request = new InviteUserCommand()
 			{
 				Email = userEmail
 			};
@@ -25,9 +26,10 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(InviteUserCommand.ResultStatus.Success));
-				Assert.That(result.UserId, Is.Not.Null);
-				Assert.That(result.Token, Is.Not.Null.And.Not.WhiteSpace);
+				Assert.That(result.IsSuccess, Is.True);
+				Assert.That(result.Value?.UserId, Is.Not.Null);
+				Assert.That(result.Value?.Token, Is.Not.Null.And.Not.WhiteSpace);
+				Assert.That(result.Value?.Resend, Is.False);
 
 				await ScopeAsync(async services =>
 				{
@@ -43,7 +45,7 @@ namespace Test.Integration.Users
 		public async Task NonEmailConfirmedUser_ReturnsSuccessWithResend()
 		{
 			// Arrange
-			var request = new InviteUserCommand.Request()
+			var request = new InviteUserCommand()
 			{
 				Email = "tester@test.com"
 			};
@@ -57,11 +59,12 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(InviteUserCommand.ResultStatus.SuccessWithResend));
-				Assert.That(result.UserId, Is.Not.Null);
-				Assert.That(result.Token, Is.Not.Null.And.Not.WhiteSpace);
+				Assert.That(result.IsSuccess, Is.True);
+				Assert.That(result.Value?.UserId, Is.Not.Null);
+				Assert.That(result.Value?.Token, Is.Not.Null.And.Not.WhiteSpace);
+				Assert.That(result.Value?.Resend, Is.True);
 
-				Assert.That(result.Token, Is.Not.EqualTo(arrangeResult.Token));
+				Assert.That(result.Value!.Token, Is.Not.EqualTo(arrangeResult.Value!.Token));
 			}
 		}
 
@@ -69,17 +72,17 @@ namespace Test.Integration.Users
 		public async Task ExistingUser_ReturnsAlreadyExists()
 		{
 			// Arrange
-			var inviteRequest = new InviteUserCommand.Request()
+			var inviteRequest = new InviteUserCommand()
 			{
 				Email = "tester@test.com"
 			};
 
 			var inviteResult = await SendAsync(inviteRequest);
 
-			var registerRequest = new ConfirmResetPasswordHandler.Request()
+			var registerRequest = new ConfirmResetPasswordCommand()
 			{
-				UserId = inviteResult.UserId,
-				Token = inviteResult.Token!,
+				UserId = inviteResult.Value!.UserId,
+				Token = inviteResult.Value!.Token,
 				Password = "P@$$w0rd!",
 				ConfirmPassword = "P@$$w0rd!"
 			};
@@ -93,7 +96,8 @@ namespace Test.Integration.Users
 			using (Assert.EnterMultipleScope())
 			{
 				Assert.That(result, Is.Not.Null);
-				Assert.That(result.Status, Is.EqualTo(InviteUserCommand.ResultStatus.AlreadyExists));
+				Assert.That(result.IsSuccess, Is.False);
+				Assert.That(result.Error, Is.EqualTo(UserErrors.NotUnique));
 			}
 		}
 	}

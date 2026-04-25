@@ -47,7 +47,7 @@ namespace Application.Features.Users.InviteUser
 					else
 					{
 						_logger.LogError("Something went wrong while creating password reset token for existing user with e-mail '{Email}'.", request.Email);
-						return Result<InviteUserResult>.Failure(UserErrors.Failure);
+						return Result<InviteUserResult>.Failure(CommonErrors.Failure);
 					}
 				}
 			}
@@ -58,7 +58,7 @@ namespace Application.Features.Users.InviteUser
 			if (!createResult.Succeeded)
 			{
 				_logger.LogError("Unexpected error while creating user with e-mail '{Email}'.", request.Email);
-				return Result<InviteUserResult>.Failure(UserErrors.Failure);
+				return Result<InviteUserResult>.Failure(CommonErrors.Failure);
 			}
 
 			var passwordTokenRequest = new RequestResetPasswordCommand()
@@ -75,7 +75,7 @@ namespace Application.Features.Users.InviteUser
 			else
 			{
 				_logger.LogError("Something went wrong while creating password reset token for new user with e-mail '{Email}'.", request.Email);
-				return Result<InviteUserResult>.Failure(UserErrors.Failure);
+				return Result<InviteUserResult>.Failure(CommonErrors.Failure);
 			}
 		}
 	}
