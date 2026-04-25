@@ -1,0 +1,32 @@
+﻿@using System.Globalization
+
+@namespace Service.Mailing.Components.Mails
+
+@layout MailLayout
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1 { color: #2c3e50; }
+    </style>
+</head>
+<body>
+    <h1>Welcome, @FirstName!</h1>
+
+    <p>
+        Thanks for joining <strong>Verdant</strong>.
+    </p>
+
+    <p>
+        <a href="@RegisterUrl">Register your account</a>
+    </p>
+</body>
+</html>
+
+@code {
+    [Parameter] public string FirstName { get; set; } = default!;
+    [Parameter] public string RegisterUrl { get; set; } = default!;
+}

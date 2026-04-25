@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using SnackTrace2.Models;
+using Web.Models;
 
-namespace SnackTrace2.Controllers
+namespace Web.Controllers
 {
     public class HomeController : Controller
     {

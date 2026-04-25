@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+	<PackageReference Include="Microsoft.Web.LibraryManager.Build" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
 
@@ -19,6 +20,11 @@
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Data\Infrastructure.csproj" />
     <ProjectReference Include="..\Feature\Feature.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\MailTemplates\" />
+    <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 
 </Project>
