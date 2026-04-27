@@ -12,8 +12,6 @@ namespace Infrastructure.Mailing.Options
         [Range(1, 65535)]
         public int Port { get; set; }
 
-        public bool UseSsl { get; set; }
-
         public string Username { get; set; } = default!;
 
         public string Password { get; set; } = default!;

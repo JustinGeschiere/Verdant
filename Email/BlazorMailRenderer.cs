@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Email.Abstractions;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.Extensions.Logging.Abstractions;
-using Email.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Email
 {
@@ -17,12 +18,16 @@ namespace Email
 		public async Task<string> RenderAsync<TComponent>(IMailTemplate<TComponent> template)
 			where TComponent : IComponent
 		{
-			var htmlRenderer = new HtmlRenderer(_serviceProvider, NullLoggerFactory.Instance);
+			await using var scope = _serviceProvider.CreateAsyncScope();
 
-			var result = await htmlRenderer.Dispatcher.InvokeAsync(() =>
-				htmlRenderer.RenderComponentAsync<TComponent>(template.ToParameters()));
+			var loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
+			var renderer = new HtmlRenderer(scope.ServiceProvider, loggerFactory);
 
-			return result.ToHtmlString();
+			return await renderer.Dispatcher.InvokeAsync(async () =>
+			{
+				var render = await renderer.RenderComponentAsync<TComponent>(template.ToParameters());
+				return render.ToHtmlString();
+			});
 		}
 	}
 }

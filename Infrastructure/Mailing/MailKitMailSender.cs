@@ -34,8 +34,7 @@ namespace Infrastructure.Mailing
             using var client = new SmtpClient();
             try
             {
-                await client.ConnectAsync(_smtpOptions.Host, _smtpOptions.Port,
-                    _smtpOptions.UseSsl ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.StartTls);
+                await client.ConnectAsync(_smtpOptions.Host, _smtpOptions.Port, SecureSocketOptions.Auto);
 
                 if (!string.IsNullOrEmpty(_smtpOptions.Username))
                 {
