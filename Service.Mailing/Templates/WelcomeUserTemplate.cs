@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Service.Mailing.Abstractions;
-using Service.Mailing.Components.Mails;
+using Email.Abstractions;
+using Email.Components.Mails;
 
-namespace Service.Mailing.Templates
+namespace Email.Templates
 {
     public class WelcomeUserTemplate : IMailTemplate<WelcomeUser>
     {

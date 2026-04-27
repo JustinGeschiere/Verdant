@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-namespace Service.Mailing.Abstractions
+namespace Email.Abstractions
 {
     public interface IMailTemplate<TComponent>
         where TComponent : IComponent

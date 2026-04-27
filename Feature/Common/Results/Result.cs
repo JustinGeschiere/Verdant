@@ -1,4 +1,4 @@
-﻿using Application.Common.Results.Abstraction;
+﻿using Application.Common.Results.Abstractions;
 using Application.Common.Validation;
 
 namespace Application.Common.Results

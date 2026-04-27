@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Service.Mailing.Options
+namespace Infrastructure.Mailing.Options
 {
     public class SmtpOptions
     {

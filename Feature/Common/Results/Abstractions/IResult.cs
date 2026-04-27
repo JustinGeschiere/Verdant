@@ -1,6 +1,6 @@
 ﻿using Application.Common.Validation;
 
-namespace Application.Common.Results.Abstraction
+namespace Application.Common.Results.Abstractions
 {
 	public interface IResult<TSelf>
 		where TSelf : IResult<TSelf>

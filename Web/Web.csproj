@@ -27,6 +27,7 @@
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Data\Infrastructure.csproj" />
     <ProjectReference Include="..\Feature\Application.csproj" />
+    <ProjectReference Include="..\Service.Mailing\Email.csproj" />
   </ItemGroup>
 
   <ItemGroup>

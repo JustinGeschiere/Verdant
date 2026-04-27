@@ -1,32 +1,28 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Service.Mailing.Abstractions;
+using Microsoft.Extensions.Logging.Abstractions;
+using Email.Abstractions;
 
-namespace Service.Mailing
+namespace Email
 {
-    internal class BlazorMailRenderer : IMailRenderer
-    {
-        private readonly IServiceProvider _serviceProvider;
+	internal class BlazorMailRenderer : IMailRenderer
+	{
+		private readonly IServiceProvider _serviceProvider;
 
-        public BlazorMailRenderer(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
+		public BlazorMailRenderer(IServiceProvider serviceProvider)
+		{
+			_serviceProvider = serviceProvider;
+		}
 
-        public async Task<string> RenderAsync<TComponent>(IMailTemplate<TComponent> template)
-            where TComponent : IComponent
-        {
-            await using var scope = _serviceProvider.CreateAsyncScope();
+		public async Task<string> RenderAsync<TComponent>(IMailTemplate<TComponent> template)
+			where TComponent : IComponent
+		{
+			var htmlRenderer = new HtmlRenderer(_serviceProvider, NullLoggerFactory.Instance);
 
-            var loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
-            var renderer = new HtmlRenderer(scope.ServiceProvider, loggerFactory);
+			var result = await htmlRenderer.Dispatcher.InvokeAsync(() =>
+				htmlRenderer.RenderComponentAsync<TComponent>(template.ToParameters()));
 
-            var result = await renderer.Dispatcher.InvokeAsync(() =>
-                renderer.RenderComponentAsync<TComponent>(template.ToParameters()));
-
-            return result.ToHtmlString();
-        }
-    }
+			return result.ToHtmlString();
+		}
+	}
 }

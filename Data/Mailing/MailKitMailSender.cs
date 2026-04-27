@@ -1,35 +1,25 @@
-﻿using MailKit.Net.Smtp;
+﻿using Infrastructure.Mailing.Abstractions;
+using Infrastructure.Mailing.Options;
+using MailKit.Net.Smtp;
 using MailKit.Security;
-using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using Service.Mailing.Abstractions;
-using Service.Mailing.Options;
 
-namespace Service.Mailing
+namespace Infrastructure.Mailing
 {
     internal class MailKitMailSender : IMailSender
     {
         private readonly SmtpOptions _smtpOptions;
-        private readonly IMailRenderer _mailRenderer;
         private readonly ILogger _logger;
 
-        public MailKitMailSender(IOptions<SmtpOptions> smtpOptions, IMailRenderer mailRenderer, ILogger<MailKitMailSender> logger)
+        public MailKitMailSender(IOptions<SmtpOptions> smtpOptions, ILogger<MailKitMailSender> logger)
         {
             _smtpOptions = smtpOptions.Value;
-            _mailRenderer = mailRenderer;
             _logger = logger;
         }
 
-        public async Task<bool> SendTemplateAsync<TComponent>(string receiver, IMailTemplate<TComponent> template)
-            where TComponent : IComponent
-        {
-            var body = await _mailRenderer.RenderAsync(template);
-            return await SendHtmlAsync(receiver, template.GetSubject(), body);
-        }
-
-        private async Task<bool> SendHtmlAsync(string receiver, string subject, string body)
+        public async Task<bool> SendHtmlAsync(string receiver, string subject, string body)
         {
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(_smtpOptions.FromName, _smtpOptions.FromEmail));

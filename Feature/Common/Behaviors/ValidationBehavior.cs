@@ -1,5 +1,5 @@
 ﻿using Application.Common.Errors;
-using Application.Common.Results.Abstraction;
+using Application.Common.Results.Abstractions;
 using Application.Common.Validation;
 using FluentValidation;
 using MediatR;

@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Web.Extensions;
+using Infrastructure.Composition;
+using Email.Composition;
 
 namespace Web;
 
@@ -20,6 +22,10 @@ public class Startup(IConfiguration configuration)
 
 		// Mediatr registration
 		services.AddVerdantFeatures();
+
+		// Mail rendering + sending
+		services.AddMailing(configuration);
+		services.AddMailRendering();
 
 		services.AddHttpContextAccessor();
 
