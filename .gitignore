@@ -421,4 +421,4 @@ FodyWeavers.xsd
 .ci/dependencies/.storage/
 
 # Client-side libraries (we manage these with libman)
-Web/wwwroot/lib
+src/Frontend/wwwroot/lib
