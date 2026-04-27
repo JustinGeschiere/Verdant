@@ -55,9 +55,11 @@ namespace Application.Features.Users.InviteUser
 							RegisterToken = resendResult.Value!.Token
 						};
 
+						var body = await _mailRenderer.RenderAsync(template);
+
 						try
 						{
-							await _mailSender.SendHtmlAsync(existingUser.Email!, template.GetSubject(), await _mailRenderer.RenderAsync(template));
+							await _mailSender.SendHtmlAsync(existingUser.Email!, template.GetSubject(), body);
 							return Result<InviteUserResult>.Success(new InviteUserResult(resendResult.Value!.UserId, resendResult.Value!.Token, resend: true));
 						}
 						catch (Exception e)

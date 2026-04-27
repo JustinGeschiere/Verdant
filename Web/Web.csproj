@@ -24,10 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Data\Infrastructure.csproj" />
+    <ProjectReference Include="..\Email\Email.csproj" />
     <ProjectReference Include="..\Feature\Application.csproj" />
-    <ProjectReference Include="..\Service.Mailing\Email.csproj" />
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
