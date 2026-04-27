@@ -2,6 +2,9 @@
 using Application.Common.Results;
 using Application.Features.Users.RequestResetPassword;
 using Domain.Users;
+using Email.Abstractions;
+using Email.Templates;
+using Infrastructure.Mailing.Abstractions;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -11,12 +14,16 @@ namespace Application.Features.Users.InviteUser
 	public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand, Result<InviteUserResult>>
 	{
 		private readonly UserManager<User> _userManager;
+		private readonly IMailRenderer _mailRenderer;
+		private readonly IMailSender _mailSender;
 		private readonly IMediator _mediator;
 		private readonly ILogger _logger;
 
-		public InviteUserHandler(UserManager<User> userManager, IMediator mediator, ILogger<InviteUserCommand> logger)
+		public InviteUserHandler(UserManager<User> userManager, IMailRenderer mailRenderer, IMailSender mailSender, IMediator mediator, ILogger<InviteUserCommand> logger)
 		{
 			_userManager = userManager;
+			_mailRenderer = mailRenderer;
+			_mailSender = mailSender;
 			_mediator = mediator;
 			_logger = logger;
 		}
@@ -42,7 +49,22 @@ namespace Application.Features.Users.InviteUser
 					var resendResult = await _mediator.Send(resendPasswordTokenRequest);
 					if (resendResult.IsSuccess)
 					{
-						return Result<InviteUserResult>.Success(new InviteUserResult(resendResult.Value!.UserId, resendResult.Value!.Token, resend: true));
+						var template = new WelcomeUserTemplate()
+						{
+							FirstName = existingUser.Email!,
+							RegisterToken = resendResult.Value!.Token
+						};
+
+						try
+						{
+							await _mailSender.SendHtmlAsync(existingUser.Email!, template.GetSubject(), await _mailRenderer.RenderAsync(template));
+							return Result<InviteUserResult>.Success(new InviteUserResult(resendResult.Value!.UserId, resendResult.Value!.Token, resend: true));
+						}
+						catch (Exception e)
+						{
+							_logger.LogError(e, "Something went wrong while sending invite e-mail to new existing with e-mail '{Email}'.", request.Email);
+							return Result<InviteUserResult>.Failure(CommonErrors.Failure);
+						}
 					}
 					else
 					{
@@ -69,8 +91,22 @@ namespace Application.Features.Users.InviteUser
 			var requestResult = await _mediator.Send(passwordTokenRequest);
 			if (requestResult.IsSuccess)
 			{
+				var template = new WelcomeUserTemplate()
+				{
+					FirstName = user.Email!,
+					RegisterToken = requestResult.Value!.Token
+				};
 
-				return Result<InviteUserResult>.Success(new InviteUserResult(requestResult.Value!.UserId, requestResult.Value!.Token, resend: false));
+				try
+				{
+					await _mailSender.SendHtmlAsync(user.Email!, template.GetSubject(), await _mailRenderer.RenderAsync(template));
+					return Result<InviteUserResult>.Success(new InviteUserResult(requestResult.Value!.UserId, requestResult.Value!.Token, resend: false));
+				}
+				catch(Exception e)
+				{
+					_logger.LogError(e, "Something went wrong while sending invite e-mail to new user with e-mail '{Email}'.", request.Email);
+					return Result<InviteUserResult>.Failure(CommonErrors.Failure);
+				}
 			}
 			else
 			{
