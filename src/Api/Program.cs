@@ -1,3 +1,4 @@
+using Api.Composition;
 using Application.Composition;
 using Domain.Roles;
 using Domain.Users;

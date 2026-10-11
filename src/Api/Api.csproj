@@ -11,10 +11,7 @@
 	<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
 	<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
 	<PackageReference Include="Microsoft.AspNetCore.Identity.UI" />
-	<PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-	  <PrivateAssets>all</PrivateAssets>
-	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	</PackageReference>
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
 	<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
 
