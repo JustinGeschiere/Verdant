@@ -3,7 +3,7 @@ using Mediator;
 
 namespace Application.Features.Users.ConfirmResetPassword
 {
-	public sealed record ConfirmResetPasswordCommand : ICommand<Result>
+	public sealed record ConfirmResetPasswordCommand : IRequest<Result>
 	{
 		public Guid UserId { get; init; }
 

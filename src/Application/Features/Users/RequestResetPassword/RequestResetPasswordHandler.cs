@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Users.RequestResetPassword
 {
-	public class RequestResetPasswordHandler : ICommandHandler<RequestResetPasswordCommand, Result<RequestResetPasswordResult>>
+	public class RequestResetPasswordHandler : IRequestHandler<RequestResetPasswordCommand, Result<RequestResetPasswordResult>>
 	{
 		private readonly UserManager<User> _userManager;
 		private readonly ILogger _logger;

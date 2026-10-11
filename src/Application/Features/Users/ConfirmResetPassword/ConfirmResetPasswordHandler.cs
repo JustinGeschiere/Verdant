@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Users.ConfirmResetPassword
 {
-	public sealed class ConfirmResetPasswordHandler : ICommandHandler<ConfirmResetPasswordCommand, Result>
+	public sealed class ConfirmResetPasswordHandler : IRequestHandler<ConfirmResetPasswordCommand, Result>
 	{
 		private readonly UserManager<User> _userManager;
 		private readonly ILogger _logger;

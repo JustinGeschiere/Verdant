@@ -2,7 +2,6 @@
 using IntegrationTests.Framework.Extensions;
 using IntegrationTests.Framework.Services.Abstractions;
 using IntegrationTests.Framework.Services.Implementations;
-using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
@@ -11,7 +10,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Web.Composition;
+using Api.Composition;
+using Mediator;
 
 namespace IntegrationTests.Framework
 {
@@ -156,14 +156,14 @@ namespace IntegrationTests.Framework
 			return await action(scope.ServiceProvider);
 		}
 
-		public Task SendAsync(IRequest request)
+		public Task SendAsync(IRequest message)
 		{
-			return ScopeAsync(i => i.GetRequiredService<IMediator>().Send(request));
+			return ScopeAsync(i => i.GetRequiredService<IMediator>().Send(message).AsTask());
 		}
 
 		public Task<T> SendAsync<T>(IRequest<T> request)
 		{
-			return ScopeAsync(i => i.GetRequiredService<IMediator>().Send(request));
+			return ScopeAsync(i => i.GetRequiredService<IMediator>().Send(request).AsTask());
 		}
 	}
 }
