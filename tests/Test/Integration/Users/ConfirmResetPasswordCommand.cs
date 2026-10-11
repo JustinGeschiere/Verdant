@@ -3,7 +3,6 @@ using Application.Features.Users.ConfirmResetPassword;
 using Application.Features.Users.InviteUser;
 using Application.Features.Users.RequestResetPassword;
 using Domain.Users;
-using IntegrationTests;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 

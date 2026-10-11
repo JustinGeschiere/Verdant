@@ -8,25 +8,26 @@ using Moq;
 
 namespace IntegrationTests
 {
-	[TestFixture]
-	public class VerdantFixture : HostedTestFixture<VerdantContext>
+	/// <summary>
+	/// Test fixture with database and mocked email service.
+	/// </summary>
+	public class VerdantFixture : DatabaseIntegrationTestBase<VerdantContext>
 	{
-		protected override void ConfigureOverrideServices(IServiceCollection services)
+		protected override void ConfigureServices(IServiceCollection services)
 		{
-			base.ConfigureOverrideServices(services);
+			base.ConfigureServices(services);
 
-			// Override token lifetimes to include expiration behavior in tests
+			// Override token lifetimes to test expiration behavior
 			services.Configure<DataProtectionTokenProviderOptions>(options =>
 			{
 				options.TokenLifespan = TimeSpan.FromSeconds(5);
 			});
 
-			// Replace mail sender service with mocked instance
+			// Mock the email service
 			services.RemoveServiceRegistrations<IMailSender>();
-			var mailSenderMock = new Mock<IMailSender>();
 
-			mailSenderMock
-				.Setup(i => i.SendHtmlAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+			var mailSenderMock = new Mock<IMailSender>();
+			mailSenderMock.Setup(i => i.SendHtmlAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
 				.ReturnsAsync(true);
 
 			services.AddSingleton<IMailSender>(mailSenderMock.Object);

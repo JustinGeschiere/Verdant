@@ -13,7 +13,7 @@ namespace Api.Composition
             services.AddScoped<ISetUpTask, IdentityRolesTask>();
             services.AddScoped<ISetUpTask, SystemUserTask>();
 
-            // Hosted service
+            // Hosted service that runs tasks on startup
             services.AddHostedService<SetUpHostedService>();
 
             return services;
