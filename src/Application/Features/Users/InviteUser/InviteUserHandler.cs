@@ -5,7 +5,7 @@ using Domain.Users;
 using Email.Abstractions;
 using Email.Templates;
 using Infrastructure.Mailing.Abstractions;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
@@ -28,7 +28,7 @@ namespace Application.Features.Users.InviteUser
 			_logger = logger;
 		}
 
-		public async Task<Result<InviteUserResult>> Handle(InviteUserCommand request, CancellationToken cancellationToken)
+		public async ValueTask<Result<InviteUserResult>> Handle(InviteUserCommand request, CancellationToken cancellationToken)
 		{
 			var existingUser = await _userManager.FindByEmailAsync(request.Email);
 			if (existingUser != null)

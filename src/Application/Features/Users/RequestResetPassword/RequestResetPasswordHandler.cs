@@ -1,13 +1,13 @@
 ﻿using Application.Common.Errors;
 using Application.Common.Results;
 using Domain.Users;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Users.RequestResetPassword
 {
-	public class RequestResetPasswordHandler : IRequestHandler<RequestResetPasswordCommand, Result<RequestResetPasswordResult>>
+	public class RequestResetPasswordHandler : ICommandHandler<RequestResetPasswordCommand, Result<RequestResetPasswordResult>>
 	{
 		private readonly UserManager<User> _userManager;
 		private readonly ILogger _logger;
@@ -18,7 +18,7 @@ namespace Application.Features.Users.RequestResetPassword
 			_logger = logger;
 		}
 
-		public async Task<Result<RequestResetPasswordResult>> Handle(RequestResetPasswordCommand request, CancellationToken cancellationToken)
+		public async ValueTask<Result<RequestResetPasswordResult>> Handle(RequestResetPasswordCommand request, CancellationToken cancellationToken)
 		{
 			var user = await _userManager.FindByIdAsync(request.UserId.ToString());
 			if (user == null)

@@ -1,13 +1,13 @@
 ﻿using Application.Common.Errors;
 using Application.Common.Results;
 using Domain.Users;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Users.ConfirmResetPassword
 {
-	public sealed class ConfirmResetPasswordHandler : IRequestHandler<ConfirmResetPasswordCommand, Result>
+	public sealed class ConfirmResetPasswordHandler : ICommandHandler<ConfirmResetPasswordCommand, Result>
 	{
 		private readonly UserManager<User> _userManager;
 		private readonly ILogger _logger;
@@ -18,7 +18,7 @@ namespace Application.Features.Users.ConfirmResetPassword
 			_logger = logger;
 		}
 
-		public async Task<Result> Handle(ConfirmResetPasswordCommand request, CancellationToken cancellationToken)
+		public async ValueTask<Result> Handle(ConfirmResetPasswordCommand request, CancellationToken cancellationToken)
 		{
 			var user = await _userManager.FindByIdAsync(request.UserId.ToString() ?? string.Empty);
 			if (user == null)

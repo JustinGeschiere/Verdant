@@ -1,9 +1,9 @@
 ﻿using Application.Common.Results;
-using MediatR;
+using Mediator;
 
 namespace Application.Features.Users.RequestResetPassword
 {
-	public record RequestResetPasswordCommand : IRequest<Result<RequestResetPasswordResult>>
+	public record RequestResetPasswordCommand : ICommand<Result<RequestResetPasswordResult>>
 	{
 		public Guid UserId { get; init; }
 	}

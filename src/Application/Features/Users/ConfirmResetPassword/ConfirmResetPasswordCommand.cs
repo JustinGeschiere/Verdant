@@ -1,9 +1,9 @@
 ﻿using Application.Common.Results;
-using MediatR;
+using Mediator;
 
 namespace Application.Features.Users.ConfirmResetPassword
 {
-	public sealed record ConfirmResetPasswordCommand : IRequest<Result>
+	public sealed record ConfirmResetPasswordCommand : ICommand<Result>
 	{
 		public Guid UserId { get; init; }
 

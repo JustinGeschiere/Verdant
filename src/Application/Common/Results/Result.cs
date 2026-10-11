@@ -1,5 +1,4 @@
 ﻿using Application.Common.Results.Abstractions;
-using Application.Common.Validation;
 
 namespace Application.Common.Results
 {
@@ -26,7 +25,7 @@ namespace Application.Common.Results
 
 		public static Result Failure(Error error) => new(error, new());
 
-		public static Result ValidationFailure(Error error, ValidationScope validationScope) => new(error, validationScope.ToDictionary());
+		public static Result ValidationFailure(Error error, FailureScope validationScope) => new(error, validationScope.ToDictionary());
 	}
 
 	public sealed class Result<T> : IResult<Result<T>>
@@ -54,6 +53,6 @@ namespace Application.Common.Results
 
 		public static Result<T> Failure(Error error) => new(error, new());
 
-		public static Result<T> ValidationFailure(Error error, ValidationScope validationScope) => new(error, validationScope.ToDictionary());
+		public static Result<T> ValidationFailure(Error error, FailureScope validationScope) => new(error, validationScope.ToDictionary());
 	}
 }

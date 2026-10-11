@@ -1,5 +1,5 @@
 ﻿using Application.Common.Results;
-using MediatR;
+using Mediator;
 
 namespace Application.Features.Users.InviteUser
 {

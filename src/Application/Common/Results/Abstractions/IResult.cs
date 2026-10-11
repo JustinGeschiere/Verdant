@@ -1,6 +1,4 @@
-﻿using Application.Common.Validation;
-
-namespace Application.Common.Results.Abstractions
+﻿namespace Application.Common.Results.Abstractions
 {
 	public interface IResult<TSelf>
 		where TSelf : IResult<TSelf>
@@ -11,6 +9,6 @@ namespace Application.Common.Results.Abstractions
 
 		static abstract TSelf Failure(Error error);
 
-		static abstract TSelf ValidationFailure(Error error, ValidationScope validationScope);
+		static abstract TSelf ValidationFailure(Error error, FailureScope validationScope);
 	}
 }

@@ -1,30 +1,30 @@
 ﻿using Application.Common.Errors;
+using Application.Common.Results;
 using Application.Common.Results.Abstractions;
-using Application.Common.Validation;
 using FluentValidation;
-using MediatR;
+using Mediator;
 
 namespace Application.Common.Behaviors
 {
-	public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-		where TRequest : notnull
+	public sealed class ValidationBehavior<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
+		where TMessage : IMessage
 		where TResponse : IResult<TResponse>
 	{
-		private readonly IEnumerable<IValidator<TRequest>> _validators;
+		private readonly IEnumerable<IValidator<TMessage>> _validators;
 
-		public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
+		public ValidationBehavior(IEnumerable<IValidator<TMessage>> validators)
 		{
 			_validators = validators;
 		}
 
-		public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+		public async ValueTask<TResponse> Handle(TMessage message, MessageHandlerDelegate<TMessage, TResponse> next, CancellationToken cancellationToken)
 		{
 			if (!_validators.Any())
 			{
-				return await next();
+				return await next(message, cancellationToken);
 			}
 
-			var context = new ValidationContext<TRequest>(request);
+			var context = new ValidationContext<TMessage>(message);
 
 			var validationResults = await Task.WhenAll(_validators.Select(i => i.ValidateAsync(context, cancellationToken)));
 
@@ -34,10 +34,10 @@ namespace Application.Common.Behaviors
 
 			if (failures.Count == 0)
 			{
-				return await next();
+				return await next(message, cancellationToken);
 			}
 
-			var validationScope = ValidationScope.Run(scope =>
+			var failureScope = FailureScope.Run(scope =>
 			{
 				foreach (var failure in failures)
 				{
@@ -45,7 +45,7 @@ namespace Application.Common.Behaviors
 				}
 			});
 
-			return TResponse.ValidationFailure(CommonErrors.Validation, validationScope);
+			return TResponse.ValidationFailure(CommonErrors.Validation, failureScope);
 		}
 	}
 }

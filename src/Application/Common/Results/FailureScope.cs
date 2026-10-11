@@ -1,6 +1,6 @@
-﻿namespace Application.Common.Validation
+﻿namespace Application.Common.Results
 {
-	public sealed class ValidationScope
+	public sealed class FailureScope
 	{
 		private readonly Dictionary<string, string[]> _errors = new();
 
@@ -24,17 +24,17 @@
 		public Dictionary<string, string[]> ToDictionary()
 			=> new(_errors);
 
-		public static ValidationScope Run(Action<ValidationScope> action)
+		public static FailureScope Run(Action<FailureScope> action)
 		{
-			var scope = new ValidationScope();
+			var scope = new FailureScope();
 			action(scope);
 
 			return scope;
 		}
 
-		public static async Task<ValidationScope> Run(Func<ValidationScope, Task> action)
+		public static async Task<FailureScope> Run(Func<FailureScope, Task> action)
 		{
-			var scope = new ValidationScope();
+			var scope = new FailureScope();
 			await action(scope);
 
 			return scope;
