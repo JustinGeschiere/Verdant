@@ -2,16 +2,14 @@
 using IntegrationTests.Framework.Extensions;
 using IntegrationTests.Framework.Services.Abstractions;
 using IntegrationTests.Framework.Services.Implementations;
+using Mediator;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Api.Composition;
-using Mediator;
 
 namespace IntegrationTests.Framework
 {
@@ -49,10 +47,6 @@ namespace IntegrationTests.Framework
 			});
 		}
 
-		/// <summary>
-		/// Override method for implementations to specify custom service registrations
-		/// </summary>
-		/// <param name="services"></param>
 		protected override void ConfigureOverrideServices(IServiceCollection services)
 		{
 			base.ConfigureOverrideServices(services);
@@ -72,40 +66,40 @@ namespace IntegrationTests.Framework
 	[Parallelizable(ParallelScope.None)]
 	public abstract class HostedTestFixture
 	{
-		protected IHost Host { get; private set; } = default!;
-		protected TestServer Server { get; private set; } = default!;
+		private sealed class VerdantTestFactory : WebApplicationFactory<Program>
+		{
+			private readonly Action<IServiceCollection> configureServices;
+
+			public VerdantTestFactory(Action<IServiceCollection> configureServices)
+			{
+				this.configureServices = configureServices;
+			}
+
+			protected override void ConfigureWebHost(IWebHostBuilder builder)
+			{
+				builder.UseEnvironment("Test");
+				builder.ConfigureServices(configureServices);
+			}
+		}
+
+		protected WebApplicationFactory<Program> Factory { get; private set; } = default!;
 		protected IServiceProvider Services { get; private set; } = default!;
 
 		[OneTimeSetUp]
 		public virtual async Task OneTimeSetUp()
 		{
-			Host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
-				.ConfigureWebHostDefaults(webBuilder =>
-				{
-					webBuilder.UseEnvironment("Test");
-					webBuilder.UseStartup<Startup>();
-					webBuilder.UseTestServer();
+			Factory = new VerdantTestFactory(ConfigureOverrideServices);
+			Services = Factory.Services;
 
-					// Service configuration overrides
-					webBuilder.ConfigureServices(services => ConfigureOverrideServices(services));
-				}).Build();
-
-			await Host.StartAsync();
-
-			Server = Host.GetTestServer();
-			Services = Host.Services;
+			await Task.CompletedTask;
 		}
 
 		[OneTimeTearDown]
 		public virtual async Task OneTimeTearDown()
 		{
-			if (Host != null)
-			{
-				await Host.StopAsync();
-			}
+			Factory?.Dispose();
 
-			Server?.Dispose();
-			Host?.Dispose();
+			await Task.CompletedTask;
 		}
 
 		[SetUp]
@@ -113,7 +107,6 @@ namespace IntegrationTests.Framework
 		{
 			await ScopeAsync(async services =>
 			{
-				// Start every test with a clear (anonymous) http context
 				var httpContextBuilder = services.GetRequiredService<IHttpContextBuilder>();
 				httpContextBuilder.Clear();
 			});
@@ -122,13 +115,9 @@ namespace IntegrationTests.Framework
 		[TearDown]
 		public virtual async Task TearDown()
 		{
-			// No implementation, but still present to provide overridable TearDown to pair with SetUp
+			await Task.CompletedTask;
 		}
 
-		/// <summary>
-		/// Override method for implementations to specify custom service registrations
-		/// </summary>
-		/// <param name="services"></param>
 		protected virtual void ConfigureOverrideServices(IServiceCollection services)
 		{
 			services.AddSingleton<IHttpContextBuilder, HttpContextBuilder>();
@@ -138,7 +127,6 @@ namespace IntegrationTests.Framework
 		{
 			using var scope = Services.CreateScope();
 
-			// Apply http context across async roots
 			scope.ServiceProvider.GetRequiredService<IHttpContextBuilder>()
 				.Apply();
 
@@ -149,7 +137,6 @@ namespace IntegrationTests.Framework
 		{
 			using var scope = Services.CreateScope();
 
-			// Apply http context across async roots
 			scope.ServiceProvider.GetRequiredService<IHttpContextBuilder>()
 				.Apply();
 
