@@ -1,18 +1,17 @@
 ﻿using Mediator;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Api.Endpoints
 {
-	public static class IdentityEndpoints
+	public static class UserEndpoints
 	{
 		public static IEndpointRouteBuilder MapEndpoints(IEndpointRouteBuilder builder)
 		{
-			var groupBuilder = builder.MapGroup("/identity")
-				.WithTags("Identity");
+			var groupBuilder = builder.MapGroup("/user")
+				.WithTags("User");
 
 			groupBuilder.MapPost("/test", Test)
 				.WithName("Test")
-				.WithTags("Identity");
+				.WithTags("User");
 
 			return builder;
 		}
