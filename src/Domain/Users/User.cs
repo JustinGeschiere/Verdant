@@ -1,39 +1,34 @@
 ﻿using Domain.UserPlants;
+using Domain.Users.ValueObjects;
 using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Users;
 
 public class User : IdentityUser<Guid>
 {
-	public string? FirstName { get; private set; }
+	public PersonName Name { get; private set; } = null!;
 
-	public string? LastName { get; private set; }
-
-
-	private List<UserPlant> _userPlants = new();
-	public IReadOnlyCollection<UserPlant> UserPlants => _userPlants;
-
-	public string FullName => $"{FirstName} {LastName}".Trim();
+	private List<UserPlant> _userPlants = [];
+	public IReadOnlyCollection<UserPlant> UserPlants => _userPlants.AsReadOnly();
 
 	private User()
 	{ }
 
-	public User(string email)
+	public static User Create(string email)
 	{
-		UserName = email;
-		Email = email;
+		var user = new User()
+		{
+			Email = email,
+			UserName = email,
+		};
+
+		return user;
 	}
 
-	public User(string? firstName, string? lastName)
+	public void Register(string firstName, string lastName)
 	{
-		FirstName = firstName;
-		LastName = lastName;
-	}
-
-	public void Activate(string? firstName, string? lastName)
-	{
-		FirstName = firstName;
-		LastName = lastName;
+		var name = PersonName.Create(firstName, lastName);
+		Name = name;
 
 		if (!EmailConfirmed)
 		{

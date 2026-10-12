@@ -1,26 +1,27 @@
 ﻿using Domain.Plants.ValueObjects;
 using Domain.UserPlants;
-using System.ComponentModel.DataAnnotations;
 
-namespace Domain.Plants
+namespace Domain.Plants;
+
+public class Plant
 {
-	public class Plant
+	public Guid Id { get; private set; }
+
+	public PlantName Name { get; private set; } = null!;
+
+	private readonly List<UserPlant> _userPlants = [];
+	public IReadOnlyCollection<UserPlant> UserPlants => _userPlants.AsReadOnly();
+
+	private Plant()
+	{ }
+
+	public static Plant Create(string givenName, string scientificName)
 	{
-		[Key]
-		public Guid Id { get; private set; }
+		var name = PlantName.Create(givenName, scientificName);
 
-		public PlantName Name { get; private set; } = null!;
-
-		private readonly List<UserPlant> _userPlants = new();
-		public IReadOnlyCollection<UserPlant> UserPlants => _userPlants;
-
-		private Plant()
-		{ }
-
-		public Plant(PlantName name)
+		return new Plant()
 		{
-			Id = Guid.NewGuid();
-			Name = name;
-		}
+			Name = name
+		};
 	}
 }

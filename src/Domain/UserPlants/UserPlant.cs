@@ -14,10 +14,13 @@ namespace Domain.UserPlants
 		private UserPlant()
 		{ }
 
-		public UserPlant(Guid userId, Guid plantId)
+		public static UserPlant Create(Guid userId, Guid plantId)
 		{
-			UserId = userId;
-			PlantId = plantId;
+			return new UserPlant()
+			{
+				UserId = userId,
+				PlantId = plantId
+			};
 		}
 	}
 }
