@@ -76,7 +76,7 @@ namespace Application.Features.Users.InviteUser
 				}
 			}
 
-			var user = new User(request.Email);
+			var user = User.Create(request.Email);
 
 			var createResult = await _userManager.CreateAsync(user);
 			if (!createResult.Succeeded)
