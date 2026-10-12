@@ -6,7 +6,7 @@ namespace Domain.Users;
 
 public class User : IdentityUser<Guid>
 {
-	public PersonName Name { get; private set; } = null!;
+	public PersonName? Name { get; private set; } = null!;
 
 	private List<UserPlant> _userPlants = [];
 	public IReadOnlyCollection<UserPlant> UserPlants => _userPlants.AsReadOnly();

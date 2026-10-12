@@ -16,10 +16,12 @@ public class PlantConfiguration : IEntityTypeConfiguration<Plant>
 		builder.OwnsOne(i => i.Name, i =>
 		{
 			i.Property(i => i.GivenName)
+				.HasColumnName("GivenName")
 				.HasMaxLength(256)
 				.IsRequired();
 
 			i.Property(i => i.ScientificName)
+				.HasColumnName("ScientificName")
 				.HasMaxLength(256)
 				.IsRequired();
 		});

@@ -15,16 +15,22 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 		builder.OwnsOne(i => i.Name, i =>
 		{
 			i.Property(i => i.FirstName)
+				.HasColumnName("FirstName")
 				.HasMaxLength(128)
 				.IsRequired();
 
 			i.Property(i => i.LastName)
+				.HasColumnName("LastName")
 				.HasMaxLength(128)
 				.IsRequired();
 
 			// Computed
 			i.Ignore(i => i.FullName);
 		});
+
+		// Allow the Name navigation property to be null
+		builder.Navigation(i => i.Name)
+			.IsRequired(false);
 
 		// Relationships
 		builder.HasMany(i => i.UserPlants)
